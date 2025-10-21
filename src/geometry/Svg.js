@@ -8,14 +8,8 @@
 * @class Svg
 */
 
-var Svg = {};
-
-module.exports = Svg;
-
-var Bounds = require('../geometry/Bounds');
-var Common = require('../core/Common');
-
-(function() {
+import * as Bounds from '../geometry/Bounds.js';
+import * as Common from '../core/Common.js';
 
     /**
      * Converts an SVG path into an array of vector points.
@@ -28,7 +22,7 @@ var Common = require('../core/Common');
      * @param {Number} [sampleLength=15]
      * @return {Vector[]} points
      */
-    Svg.pathToVertices = function(path, sampleLength) {
+    export function pathToVertices(path, sampleLength) {
         if (typeof window !== 'undefined' && !('SVGPathSeg' in window)) {
             Common.warn('Svg.pathToVertices: SVGPathSeg not defined, a polyfill is required.');
         }
@@ -103,7 +97,7 @@ var Common = require('../core/Common');
         };
 
         // ensure path is absolute
-        Svg._svgPathToAbsolute(path);
+        _svgPathToAbsolute(path);
 
         // get total length
         total = path.getTotalLength();
@@ -155,7 +149,7 @@ var Common = require('../core/Common');
         return points;
     };
 
-    Svg._svgPathToAbsolute = function(path) {
+    export function _svgPathToAbsolute(path) {
         // http://phrogz.net/convert-svg-path-to-all-absolute-commands
         // Copyright (c) Gavin Kistner
         // http://phrogz.net/js/_ReuseLicense.txt
@@ -222,5 +216,3 @@ var Common = require('../core/Common');
             }
         }
     };
-
-})();
