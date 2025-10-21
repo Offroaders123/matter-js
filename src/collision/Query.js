@@ -6,17 +6,11 @@
 * @class Query
 */
 
-var Query = {};
-
-module.exports = Query;
-
-var Vector = require('../geometry/Vector');
-var Collision = require('./Collision');
-var Bounds = require('../geometry/Bounds');
-var Bodies = require('../factory/Bodies');
-var Vertices = require('../geometry/Vertices');
-
-(function() {
+import * as Vector from '../geometry/Vector.js';
+import * as Collision from './Collision.js';
+import * as Bounds from '../geometry/Bounds.js';
+import * as Bodies from '../factory/Bodies.js';
+import * as Vertices from '../geometry/Vertices.js';
 
     /**
      * Returns a list of collisions between `body` and `bodies`.
@@ -25,7 +19,7 @@ var Vertices = require('../geometry/Vertices');
      * @param {body[]} bodies
      * @return {collision[]} Collisions
      */
-    Query.collides = function(body, bodies) {
+    export function collides(body, bodies) {
         var collisions = [],
             bodiesLength = bodies.length,
             bounds = body.bounds,
@@ -65,7 +59,7 @@ var Vertices = require('../geometry/Vertices');
      * @param {number} [rayWidth]
      * @return {collision[]} Collisions
      */
-    Query.ray = function(bodies, startPoint, endPoint, rayWidth) {
+    export function ray(bodies, startPoint, endPoint, rayWidth) {
         rayWidth = rayWidth || 1e-100;
 
         var rayAngle = Vector.angle(startPoint, endPoint),
@@ -73,7 +67,7 @@ var Vertices = require('../geometry/Vertices');
             rayX = (endPoint.x + startPoint.x) * 0.5,
             rayY = (endPoint.y + startPoint.y) * 0.5,
             ray = Bodies.rectangle(rayX, rayY, rayLength, rayWidth, { angle: rayAngle }),
-            collisions = Query.collides(ray, bodies);
+            collisions = collides(ray, bodies);
 
         for (var i = 0; i < collisions.length; i += 1) {
             var collision = collisions[i];
@@ -91,7 +85,7 @@ var Vertices = require('../geometry/Vertices');
      * @param {bool} [outside=false]
      * @return {body[]} The bodies matching the query
      */
-    Query.region = function(bodies, bounds, outside) {
+    export function region(bodies, bounds, outside) {
         var result = [];
 
         for (var i = 0; i < bodies.length; i++) {
@@ -111,7 +105,7 @@ var Vertices = require('../geometry/Vertices');
      * @param {vector} point
      * @return {body[]} The bodies matching the query
      */
-    Query.point = function(bodies, point) {
+    export function point(bodies, point) {
         var result = [];
 
         for (var i = 0; i < bodies.length; i++) {
@@ -132,5 +126,3 @@ var Vertices = require('../geometry/Vertices');
 
         return result;
     };
-
-})();
