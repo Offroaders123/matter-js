@@ -11,16 +11,10 @@
 * @class Composite
 */
 
-var Composite = {};
-
-module.exports = Composite;
-
-var Events = require('../core/Events');
-var Common = require('../core/Common');
-var Bounds = require('../geometry/Bounds');
-var Body = require('./Body');
-
-(function() {
+import * as Events from '../core/Events.js';
+import * as Common from '../core/Common.js';
+import * as Bounds from '../geometry/Bounds.js';
+import * as Body from './Body.js';
 
     /**
      * Creates a new composite. The options parameter is an object that specifies any properties you wish to override the defaults.
@@ -29,7 +23,7 @@ var Body = require('./Body');
      * @param {} [options]
      * @return {composite} A new composite
      */
-    Composite.create = function(options) {
+    export function create(options) {
         return Common.extend({ 
             id: Common.nextId(),
             type: 'composite',
@@ -59,7 +53,7 @@ var Body = require('./Body');
      * @param {boolean} [updateParents=false]
      * @param {boolean} [updateChildren=false]
      */
-    Composite.setModified = function(composite, isModified, updateParents, updateChildren) {
+    export function setModified(composite, isModified, updateParents, updateChildren) {
         composite.isModified = isModified;
 
         if (isModified && composite.cache) {
@@ -69,13 +63,13 @@ var Body = require('./Body');
         }
 
         if (updateParents && composite.parent) {
-            Composite.setModified(composite.parent, isModified, updateParents, updateChildren);
+            setModified(composite.parent, isModified, updateParents, updateChildren);
         }
 
         if (updateChildren) {
             for (var i = 0; i < composite.composites.length; i++) {
                 var childComposite = composite.composites[i];
-                Composite.setModified(childComposite, isModified, updateParents, updateChildren);
+                setModified(childComposite, isModified, updateParents, updateChildren);
             }
         }
     };
@@ -88,7 +82,7 @@ var Body = require('./Body');
      * @param {object|array} object A single or an array of body(s), constraint(s) or composite(s)
      * @return {composite} The original composite with the objects added
      */
-    Composite.add = function(composite, object) {
+    export function add(composite, object) {
         var objects = [].concat(object);
 
         Events.trigger(composite, 'beforeAdd', { object: object });
@@ -105,16 +99,16 @@ var Body = require('./Body');
                     break;
                 }
 
-                Composite.addBody(composite, obj);
+                addBody(composite, obj);
                 break;
             case 'constraint':
-                Composite.addConstraint(composite, obj);
+                addConstraint(composite, obj);
                 break;
             case 'composite':
-                Composite.addComposite(composite, obj);
+                addComposite(composite, obj);
                 break;
             case 'mouseConstraint':
-                Composite.addConstraint(composite, obj.constraint);
+                addConstraint(composite, obj.constraint);
                 break;
 
             }
@@ -135,7 +129,7 @@ var Body = require('./Body');
      * @param {boolean} [deep=false]
      * @return {composite} The original composite with the objects removed
      */
-    Composite.remove = function(composite, object, deep) {
+    export function remove(composite, object, deep) {
         var objects = [].concat(object);
 
         Events.trigger(composite, 'beforeRemove', { object: object });
@@ -146,16 +140,16 @@ var Body = require('./Body');
             switch (obj.type) {
 
             case 'body':
-                Composite.removeBody(composite, obj, deep);
+                removeBody(composite, obj, deep);
                 break;
             case 'constraint':
-                Composite.removeConstraint(composite, obj, deep);
+                removeConstraint(composite, obj, deep);
                 break;
             case 'composite':
-                Composite.removeComposite(composite, obj, deep);
+                removeComposite(composite, obj, deep);
                 break;
             case 'mouseConstraint':
-                Composite.removeConstraint(composite, obj.constraint);
+                removeConstraint(composite, obj.constraint);
                 break;
 
             }
@@ -174,10 +168,10 @@ var Body = require('./Body');
      * @param {composite} compositeB
      * @return {composite} The original compositeA with the objects from compositeB added
      */
-    Composite.addComposite = function(compositeA, compositeB) {
+    export function addComposite(compositeA, compositeB) {
         compositeA.composites.push(compositeB);
         compositeB.parent = compositeA;
-        Composite.setModified(compositeA, true, true, false);
+        setModified(compositeA, true, true, false);
         return compositeA;
     };
 
@@ -190,13 +184,13 @@ var Body = require('./Body');
      * @param {boolean} [deep=false]
      * @return {composite} The original compositeA with the composite removed
      */
-    Composite.removeComposite = function(compositeA, compositeB, deep) {
+    export function removeComposite(compositeA, compositeB, deep) {
         var position = Common.indexOf(compositeA.composites, compositeB);
 
         if (position !== -1) {
-            var bodies = Composite.allBodies(compositeB);
+            var bodies = allBodies(compositeB);
 
-            Composite.removeCompositeAt(compositeA, position);
+            removeCompositeAt(compositeA, position);
 
             for (var i = 0; i < bodies.length; i++) {
                 bodies[i].sleepCounter = 0;
@@ -205,7 +199,7 @@ var Body = require('./Body');
 
         if (deep) {
             for (var i = 0; i < compositeA.composites.length; i++){
-                Composite.removeComposite(compositeA.composites[i], compositeB, true);
+                removeComposite(compositeA.composites[i], compositeB, true);
             }
         }
 
@@ -220,9 +214,9 @@ var Body = require('./Body');
      * @param {number} position
      * @return {composite} The original composite with the composite removed
      */
-    Composite.removeCompositeAt = function(composite, position) {
+    export function removeCompositeAt(composite, position) {
         composite.composites.splice(position, 1);
-        Composite.setModified(composite, true, true, false);
+        setModified(composite, true, true, false);
         return composite;
     };
 
@@ -234,9 +228,9 @@ var Body = require('./Body');
      * @param {body} body
      * @return {composite} The original composite with the body added
      */
-    Composite.addBody = function(composite, body) {
+    export function addBody(composite, body) {
         composite.bodies.push(body);
-        Composite.setModified(composite, true, true, false);
+        setModified(composite, true, true, false);
         return composite;
     };
 
@@ -249,17 +243,17 @@ var Body = require('./Body');
      * @param {boolean} [deep=false]
      * @return {composite} The original composite with the body removed
      */
-    Composite.removeBody = function(composite, body, deep) {
+    export function removeBody(composite, body, deep) {
         var position = Common.indexOf(composite.bodies, body);
 
         if (position !== -1) {
-            Composite.removeBodyAt(composite, position);
+            removeBodyAt(composite, position);
             body.sleepCounter = 0;
         }
 
         if (deep) {
             for (var i = 0; i < composite.composites.length; i++){
-                Composite.removeBody(composite.composites[i], body, true);
+                removeBody(composite.composites[i], body, true);
             }
         }
 
@@ -274,9 +268,9 @@ var Body = require('./Body');
      * @param {number} position
      * @return {composite} The original composite with the body removed
      */
-    Composite.removeBodyAt = function(composite, position) {
+    export function removeBodyAt(composite, position) {
         composite.bodies.splice(position, 1);
-        Composite.setModified(composite, true, true, false);
+        setModified(composite, true, true, false);
         return composite;
     };
 
@@ -288,9 +282,9 @@ var Body = require('./Body');
      * @param {constraint} constraint
      * @return {composite} The original composite with the constraint added
      */
-    Composite.addConstraint = function(composite, constraint) {
+    export function addConstraint(composite, constraint) {
         composite.constraints.push(constraint);
-        Composite.setModified(composite, true, true, false);
+        setModified(composite, true, true, false);
         return composite;
     };
 
@@ -303,16 +297,16 @@ var Body = require('./Body');
      * @param {boolean} [deep=false]
      * @return {composite} The original composite with the constraint removed
      */
-    Composite.removeConstraint = function(composite, constraint, deep) {
+    export function removeConstraint(composite, constraint, deep) {
         var position = Common.indexOf(composite.constraints, constraint);
         
         if (position !== -1) {
-            Composite.removeConstraintAt(composite, position);
+            removeConstraintAt(composite, position);
         }
 
         if (deep) {
             for (var i = 0; i < composite.composites.length; i++){
-                Composite.removeConstraint(composite.composites[i], constraint, true);
+                removeConstraint(composite.composites[i], constraint, true);
             }
         }
 
@@ -327,9 +321,9 @@ var Body = require('./Body');
      * @param {number} position
      * @return {composite} The original composite with the constraint removed
      */
-    Composite.removeConstraintAt = function(composite, position) {
+    export function removeConstraintAt(composite, position) {
         composite.constraints.splice(position, 1);
-        Composite.setModified(composite, true, true, false);
+        setModified(composite, true, true, false);
         return composite;
     };
 
@@ -341,10 +335,10 @@ var Body = require('./Body');
      * @param {boolean} keepStatic
      * @param {boolean} [deep=false]
      */
-    Composite.clear = function(composite, keepStatic, deep) {
+    export function clear(composite, keepStatic, deep) {
         if (deep) {
             for (var i = 0; i < composite.composites.length; i++){
-                Composite.clear(composite.composites[i], keepStatic, true);
+                clear(composite.composites[i], keepStatic, true);
             }
         }
         
@@ -357,7 +351,7 @@ var Body = require('./Body');
         composite.constraints.length = 0;
         composite.composites.length = 0;
 
-        Composite.setModified(composite, true, true, false);
+        setModified(composite, true, true, false);
 
         return composite;
     };
@@ -368,7 +362,7 @@ var Body = require('./Body');
      * @param {composite} composite
      * @return {body[]} All the bodies
      */
-    Composite.allBodies = function(composite) {
+    export function allBodies(composite) {
         if (composite.cache && composite.cache.allBodies) {
             return composite.cache.allBodies;
         }
@@ -376,7 +370,7 @@ var Body = require('./Body');
         var bodies = [].concat(composite.bodies);
 
         for (var i = 0; i < composite.composites.length; i++)
-            bodies = bodies.concat(Composite.allBodies(composite.composites[i]));
+            bodies = bodies.concat(allBodies(composite.composites[i]));
 
         if (composite.cache) {
             composite.cache.allBodies = bodies;
@@ -391,7 +385,7 @@ var Body = require('./Body');
      * @param {composite} composite
      * @return {constraint[]} All the constraints
      */
-    Composite.allConstraints = function(composite) {
+    export function allConstraints(composite) {
         if (composite.cache && composite.cache.allConstraints) {
             return composite.cache.allConstraints;
         }
@@ -399,7 +393,7 @@ var Body = require('./Body');
         var constraints = [].concat(composite.constraints);
 
         for (var i = 0; i < composite.composites.length; i++)
-            constraints = constraints.concat(Composite.allConstraints(composite.composites[i]));
+            constraints = constraints.concat(allConstraints(composite.composites[i]));
 
         if (composite.cache) {
             composite.cache.allConstraints = constraints;
@@ -414,7 +408,7 @@ var Body = require('./Body');
      * @param {composite} composite
      * @return {composite[]} All the composites
      */
-    Composite.allComposites = function(composite) {
+    export function allComposites(composite) {
         if (composite.cache && composite.cache.allComposites) {
             return composite.cache.allComposites;
         }
@@ -422,7 +416,7 @@ var Body = require('./Body');
         var composites = [].concat(composite.composites);
 
         for (var i = 0; i < composite.composites.length; i++)
-            composites = composites.concat(Composite.allComposites(composite.composites[i]));
+            composites = composites.concat(allComposites(composite.composites[i]));
 
         if (composite.cache) {
             composite.cache.allComposites = composites;
@@ -439,19 +433,19 @@ var Body = require('./Body');
      * @param {string} type
      * @return {object} The requested object, if found
      */
-    Composite.get = function(composite, id, type) {
+    export function get(composite, id, type) {
         var objects,
             object;
 
         switch (type) {
         case 'body':
-            objects = Composite.allBodies(composite);
+            objects = allBodies(composite);
             break;
         case 'constraint':
-            objects = Composite.allConstraints(composite);
+            objects = allConstraints(composite);
             break;
         case 'composite':
-            objects = Composite.allComposites(composite).concat(composite);
+            objects = allComposites(composite).concat(composite);
             break;
         }
 
@@ -473,9 +467,9 @@ var Body = require('./Body');
      * @param {compositeB} compositeB
      * @return {composite} Returns compositeA
      */
-    Composite.move = function(compositeA, objects, compositeB) {
-        Composite.remove(compositeA, objects);
-        Composite.add(compositeB, objects);
+    export function move(compositeA, objects, compositeB) {
+        remove(compositeA, objects);
+        add(compositeB, objects);
         return compositeA;
     };
 
@@ -485,10 +479,10 @@ var Body = require('./Body');
      * @param {composite} composite
      * @return {composite} Returns composite
      */
-    Composite.rebase = function(composite) {
-        var objects = Composite.allBodies(composite)
-            .concat(Composite.allConstraints(composite))
-            .concat(Composite.allComposites(composite));
+    export function rebase(composite) {
+        var objects = allBodies(composite)
+            .concat(allConstraints(composite))
+            .concat(allComposites(composite));
 
         for (var i = 0; i < objects.length; i++) {
             objects[i].id = Common.nextId();
@@ -505,8 +499,8 @@ var Body = require('./Body');
      * @param {vector} translation
      * @param {bool} [recursive=true]
      */
-    Composite.translate = function(composite, translation, recursive) {
-        var bodies = recursive ? Composite.allBodies(composite) : composite.bodies;
+    export function translate(composite, translation, recursive) {
+        var bodies = recursive ? allBodies(composite) : composite.bodies;
 
         for (var i = 0; i < bodies.length; i++) {
             Body.translate(bodies[i], translation);
@@ -523,10 +517,10 @@ var Body = require('./Body');
      * @param {vector} point
      * @param {bool} [recursive=true]
      */
-    Composite.rotate = function(composite, rotation, point, recursive) {
+    export function rotate(composite, rotation, point, recursive) {
         var cos = Math.cos(rotation),
             sin = Math.sin(rotation),
-            bodies = recursive ? Composite.allBodies(composite) : composite.bodies;
+            bodies = recursive ? allBodies(composite) : composite.bodies;
 
         for (var i = 0; i < bodies.length; i++) {
             var body = bodies[i],
@@ -553,8 +547,8 @@ var Body = require('./Body');
      * @param {vector} point
      * @param {bool} [recursive=true]
      */
-    Composite.scale = function(composite, scaleX, scaleY, point, recursive) {
-        var bodies = recursive ? Composite.allBodies(composite) : composite.bodies;
+    export function scale(composite, scaleX, scaleY, point, recursive) {
+        var bodies = recursive ? allBodies(composite) : composite.bodies;
 
         for (var i = 0; i < bodies.length; i++) {
             var body = bodies[i],
@@ -578,8 +572,8 @@ var Body = require('./Body');
      * @param {composite} composite The composite.
      * @returns {bounds} The composite bounds.
      */
-    Composite.bounds = function(composite) {
-        var bodies = Composite.allBodies(composite),
+    export function bounds(composite) {
+        var bodies = allBodies(composite),
             vertices = [];
 
         for (var i = 0; i < bodies.length; i += 1) {
@@ -728,5 +722,3 @@ var Body = require('./Body');
      * @property cache
      * @type {}
      */
-
-})();
