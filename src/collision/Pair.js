@@ -4,7 +4,7 @@
 * @class Pair
 */
 
-import { create as createContact } from './Contact.js';
+import * as Contact from './Contact.js';
     
     /**
      * Creates a pair.
@@ -22,7 +22,7 @@ import { create as createContact } from './Contact.js';
             bodyA: bodyA,
             bodyB: bodyB,
             collision: collision,
-            contacts: [createContact(), createContact()],
+            contacts: [Contact.create(), Contact.create()],
             contactCount: 0,
             separation: 0,
             isActive: true,
