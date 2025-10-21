@@ -4,29 +4,23 @@
 * @class Resolver
 */
 
-var Resolver = {};
+import * as Vertices from '../geometry/Vertices.js';
+import * as Common from '../core/Common.js';
+import * as Bounds from '../geometry/Bounds.js';
 
-module.exports = Resolver;
-
-var Vertices = require('../geometry/Vertices');
-var Common = require('../core/Common');
-var Bounds = require('../geometry/Bounds');
-
-(function() {
-
-    Resolver._restingThresh = 2;
-    Resolver._restingThreshTangent = Math.sqrt(6);
-    Resolver._positionDampen = 0.9;
-    Resolver._positionWarming = 0.8;
-    Resolver._frictionNormalMultiplier = 5;
-    Resolver._frictionMaxStatic = Number.MAX_VALUE;
+    export let _restingThresh = 2;
+    export let _restingThreshTangent = Math.sqrt(6);
+    export let _positionDampen = 0.9;
+    export let _positionWarming = 0.8;
+    export let _frictionNormalMultiplier = 5;
+    export let _frictionMaxStatic = Number.MAX_VALUE;
 
     /**
      * Prepare pairs for position solving.
      * @method preSolvePosition
      * @param {pair[]} pairs
      */
-    Resolver.preSolvePosition = function(pairs) {
+    export function preSolvePosition(pairs) {
         var i,
             pair,
             contactCount,
@@ -52,7 +46,7 @@ var Bounds = require('../geometry/Bounds');
      * @param {number} delta
      * @param {number} [damping=1]
      */
-    Resolver.solvePosition = function(pairs, delta, damping) {
+    export function solvePosition(pairs, delta, damping) {
         var i,
             pair,
             collision,
@@ -61,7 +55,7 @@ var Bounds = require('../geometry/Bounds');
             normal,
             contactShare,
             positionImpulse,
-            positionDampen = Resolver._positionDampen * (damping || 1),
+            positionDampen = _positionDampen * (damping || 1),
             slopDampen = Common.clamp(delta / Common._baseDelta, 0, 1),
             pairsLength = pairs.length;
 
@@ -117,8 +111,8 @@ var Bounds = require('../geometry/Bounds');
      * @method postSolvePosition
      * @param {body[]} bodies
      */
-    Resolver.postSolvePosition = function(bodies) {
-        var positionWarming = Resolver._positionWarming,
+    export function postSolvePosition(bodies) {
+        var positionWarming = _positionWarming,
             bodiesLength = bodies.length,
             verticesTranslate = Vertices.translate,
             boundsUpdate = Bounds.update;
@@ -165,7 +159,7 @@ var Bounds = require('../geometry/Bounds');
      * @method preSolveVelocity
      * @param {pair[]} pairs
      */
-    Resolver.preSolveVelocity = function(pairs) {
+    export function preSolveVelocity(pairs) {
         var pairsLength = pairs.length,
             i,
             j;
@@ -225,14 +219,14 @@ var Bounds = require('../geometry/Bounds');
      * @param {pair[]} pairs
      * @param {number} delta
      */
-    Resolver.solveVelocity = function(pairs, delta) {
+    export function solveVelocity(pairs, delta) {
         var timeScale = delta / Common._baseDelta,
             timeScaleSquared = timeScale * timeScale,
             timeScaleCubed = timeScaleSquared * timeScale,
-            restingThresh = -Resolver._restingThresh * timeScale,
-            restingThreshTangent = Resolver._restingThreshTangent,
-            frictionNormalMultiplier = Resolver._frictionNormalMultiplier * timeScale,
-            frictionMaxStatic = Resolver._frictionMaxStatic,
+            restingThresh = -_restingThresh * timeScale,
+            restingThreshTangent = _restingThreshTangent,
+            frictionNormalMultiplier = _frictionNormalMultiplier * timeScale,
+            frictionMaxStatic = _frictionMaxStatic,
             pairsLength = pairs.length,
             tangentImpulse,
             maxFriction,
@@ -363,5 +357,3 @@ var Bounds = require('../geometry/Bounds');
             }
         }
     };
-
-})();
