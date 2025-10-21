@@ -148,7 +148,7 @@
      */
     export function shuffle(array) {
         for (var i = array.length - 1; i > 0; i--) {
-            var j = Math.floor(Common.random() * (i + 1));
+            var j = Math.floor(random() * (i + 1));
             var temp = array[i];
             array[i] = array[j];
             array[j] = temp;
@@ -164,7 +164,7 @@
      * @return {object} A random choice object from the array
      */
     export function choose(choices) {
-        return choices[Math.floor(Common.random() * choices.length)];
+        return choices[Math.floor(random() * choices.length)];
     };
 
     /**
@@ -266,7 +266,7 @@
             return Date.now();
         }
 
-        return (new Date()) - Common._nowStartTime;
+        return (new Date()) - _nowStartTime;
     };
     
     /**
@@ -455,7 +455,7 @@
 
         for (var node in graph) {
             if (!visited[node] && !temp[node]) {
-                Common._topologicalSort(node, visited, temp, graph, result);
+                _topologicalSort(node, visited, temp, graph, result);
             }
         }
 
