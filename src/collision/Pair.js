@@ -4,13 +4,7 @@
 * @class Pair
 */
 
-var Pair = {};
-
-module.exports = Pair;
-
-var Contact = require('./Contact');
-
-(function() {
+import { create as createContact } from './Contact.js';
     
     /**
      * Creates a pair.
@@ -19,16 +13,16 @@ var Contact = require('./Contact');
      * @param {number} timestamp
      * @return {pair} A new pair
      */
-    Pair.create = function(collision, timestamp) {
+    export function create(collision, timestamp) {
         var bodyA = collision.bodyA,
             bodyB = collision.bodyB;
 
         var pair = {
-            id: Pair.id(bodyA, bodyB),
+            id: id(bodyA, bodyB),
             bodyA: bodyA,
             bodyB: bodyB,
             collision: collision,
-            contacts: [Contact.create(), Contact.create()],
+            contacts: [createContact(), createContact()],
             contactCount: 0,
             separation: 0,
             isActive: true,
@@ -42,7 +36,7 @@ var Contact = require('./Contact');
             slop: 0
         };
 
-        Pair.update(pair, collision, timestamp);
+        update(pair, collision, timestamp);
 
         return pair;
     };
@@ -54,7 +48,7 @@ var Contact = require('./Contact');
      * @param {collision} collision
      * @param {number} timestamp
      */
-    Pair.update = function(pair, collision, timestamp) {
+    export function update(pair, collision, timestamp) {
         var supports = collision.supports,
             supportCount = collision.supportCount,
             contacts = pair.contacts,
@@ -98,7 +92,7 @@ var Contact = require('./Contact');
      * @param {bool} isActive
      * @param {number} timestamp
      */
-    Pair.setActive = function(pair, isActive, timestamp) {
+    export function setActive(pair, isActive, timestamp) {
         if (isActive) {
             pair.isActive = true;
             pair.timeUpdated = timestamp;
@@ -115,9 +109,7 @@ var Contact = require('./Contact');
      * @param {body} bodyB
      * @return {string} Unique pairId
      */
-    Pair.id = function(bodyA, bodyB) {
+    export function id(bodyA, bodyB) {
         return bodyA.id < bodyB.id ? bodyA.id.toString(36) + ':' + bodyB.id.toString(36) 
             : bodyB.id.toString(36) + ':' + bodyA.id.toString(36);
     };
-
-})();
