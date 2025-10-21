@@ -4,19 +4,13 @@
 * @class Sleeping
 */
 
-var Sleeping = {};
+import * as Body from '../body/Body.js';
+import * as Events from './Events.js';
+import * as Common from './Common.js';
 
-module.exports = Sleeping;
-
-var Body = require('../body/Body');
-var Events = require('./Events');
-var Common = require('./Common');
-
-(function() {
-
-    Sleeping._motionWakeThreshold = 0.18;
-    Sleeping._motionSleepThreshold = 0.08;
-    Sleeping._minBias = 0.9;
+    export let _motionWakeThreshold = 0.18;
+    export let _motionSleepThreshold = 0.08;
+    export let _minBias = 0.9;
 
     /**
      * Puts bodies to sleep or wakes them up depending on their motion.
@@ -24,9 +18,9 @@ var Common = require('./Common');
      * @param {body[]} bodies
      * @param {number} delta
      */
-    Sleeping.update = function(bodies, delta) {
+    export function update(bodies, delta) {
         var timeScale = delta / Common._baseDelta,
-            motionSleepThreshold = Sleeping._motionSleepThreshold;
+            motionSleepThreshold = _motionSleepThreshold;
         
         // update bodies sleeping status
         for (var i = 0; i < bodies.length; i++) {
@@ -37,7 +31,7 @@ var Common = require('./Common');
 
             // wake up bodies if they have a force applied
             if (body.force.x !== 0 || body.force.y !== 0) {
-                Sleeping.set(body, false);
+                set(body, false);
                 continue;
             }
 
@@ -45,13 +39,13 @@ var Common = require('./Common');
                 maxMotion = Math.max(body.motion, motion);
         
             // biased average motion estimation between frames
-            body.motion = Sleeping._minBias * minMotion + (1 - Sleeping._minBias) * maxMotion;
+            body.motion = _minBias * minMotion + (1 - _minBias) * maxMotion;
 
             if (body.sleepThreshold > 0 && body.motion < motionSleepThreshold) {
                 body.sleepCounter += 1;
                 
                 if (body.sleepCounter >= body.sleepThreshold / timeScale) {
-                    Sleeping.set(body, true);
+                    set(body, true);
                 }
             } else if (body.sleepCounter > 0) {
                 body.sleepCounter -= 1;
@@ -64,8 +58,8 @@ var Common = require('./Common');
      * @method afterCollisions
      * @param {pair[]} pairs
      */
-    Sleeping.afterCollisions = function(pairs) {
-        var motionSleepThreshold = Sleeping._motionSleepThreshold;
+    export function afterCollisions(pairs) {
+        var motionSleepThreshold = _motionSleepThreshold;
 
         // wake up bodies involved in collisions
         for (var i = 0; i < pairs.length; i++) {
@@ -88,7 +82,7 @@ var Common = require('./Common');
                     movingBody = sleepingBody === bodyA ? bodyB : bodyA;
 
                 if (!sleepingBody.isStatic && movingBody.motion > motionSleepThreshold) {
-                    Sleeping.set(sleepingBody, false);
+                    set(sleepingBody, false);
                 }
             }
         }
@@ -100,7 +94,7 @@ var Common = require('./Common');
      * @param {body} body
      * @param {boolean} isSleeping
      */
-    Sleeping.set = function(body, isSleeping) {
+    export function set(body, isSleeping) {
         var wasSleeping = body.isSleeping;
 
         if (isSleeping) {
@@ -130,5 +124,3 @@ var Common = require('./Common');
             }
         }
     };
-
-})();
