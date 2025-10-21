@@ -10,15 +10,9 @@
 * @deprecated
 */
 
-var Grid = {};
-
-module.exports = Grid;
-
-var Pair = require('./Pair');
-var Common = require('../core/Common');
+import * as Pair from './Pair.js';
+import * as Common from '../core/Common.js';
 var deprecated = Common.deprecated;
-
-(function() {
 
     /**
      * Creates a new grid.
@@ -27,7 +21,7 @@ var deprecated = Common.deprecated;
      * @param {} options
      * @return {grid} A new grid
      */
-    Grid.create = function(options) {
+    export function create(options) {
         var defaults = {
             buckets: {},
             pairs: {},
@@ -64,7 +58,7 @@ var deprecated = Common.deprecated;
      * @param {engine} engine
      * @param {boolean} forceUpdate
      */
-    Grid.update = function(grid, bodies, engine, forceUpdate) {
+    export function update(grid, bodies, engine, forceUpdate) {
         var i, col, row,
             world = engine.world,
             buckets = grid.buckets,
@@ -83,7 +77,7 @@ var deprecated = Common.deprecated;
                 || body.bounds.max.y < world.bounds.min.y || body.bounds.min.y > world.bounds.max.y))
                 continue;
 
-            var newRegion = Grid._getRegion(grid, body);
+            var newRegion = _getRegion(grid, body);
 
             // if the body has changed grid region
             if (!body.region || newRegion.id !== body.region.id || forceUpdate) {
@@ -91,13 +85,13 @@ var deprecated = Common.deprecated;
                 if (!body.region || forceUpdate)
                     body.region = newRegion;
 
-                var union = Grid._regionUnion(newRegion, body.region);
+                var union = _regionUnion(newRegion, body.region);
 
                 // update grid buckets affected by region change
                 // iterate over the union of both regions
                 for (col = union.startCol; col <= union.endCol; col++) {
                     for (row = union.startRow; row <= union.endRow; row++) {
-                        bucketId = Grid._getBucketId(col, row);
+                        bucketId = _getBucketId(col, row);
                         bucket = buckets[bucketId];
 
                         var isInsideNewRegion = (col >= newRegion.startCol && col <= newRegion.endCol
@@ -110,15 +104,15 @@ var deprecated = Common.deprecated;
                         if (!isInsideNewRegion && isInsideOldRegion) {
                             if (isInsideOldRegion) {
                                 if (bucket)
-                                    Grid._bucketRemoveBody(grid, bucket, body);
+                                    _bucketRemoveBody(grid, bucket, body);
                             }
                         }
 
                         // add to new region buckets
                         if (body.region === newRegion || (isInsideNewRegion && !isInsideOldRegion) || forceUpdate) {
                             if (!bucket)
-                                bucket = Grid._createBucket(buckets, bucketId);
-                            Grid._bucketAddBody(grid, bucket, body);
+                                bucket = _createBucket(buckets, bucketId);
+                            _bucketAddBody(grid, bucket, body);
                         }
                     }
                 }
@@ -133,7 +127,7 @@ var deprecated = Common.deprecated;
 
         // update pairs list only if pairs changed (i.e. a body changed region)
         if (gridChanged)
-            grid.pairsList = Grid._createActivePairsList(grid);
+            grid.pairsList = _createActivePairsList(grid);
     };
 
     deprecated(Grid, 'update', 'Grid.update ➤ replaced by Matter.Detector');
@@ -144,7 +138,7 @@ var deprecated = Common.deprecated;
      * @method clear
      * @param {grid} grid
      */
-    Grid.clear = function(grid) {
+    export function clear(grid) {
         grid.buckets = {};
         grid.pairs = {};
         grid.pairsList = [];
@@ -161,13 +155,13 @@ var deprecated = Common.deprecated;
      * @param {} regionB
      * @return {} region
      */
-    Grid._regionUnion = function(regionA, regionB) {
+    export function _regionUnion(regionA, regionB) {
         var startCol = Math.min(regionA.startCol, regionB.startCol),
             endCol = Math.max(regionA.endCol, regionB.endCol),
             startRow = Math.min(regionA.startRow, regionB.startRow),
             endRow = Math.max(regionA.endRow, regionB.endRow);
 
-        return Grid._createRegion(startCol, endCol, startRow, endRow);
+        return _createRegion(startCol, endCol, startRow, endRow);
     };
 
     /**
@@ -179,14 +173,14 @@ var deprecated = Common.deprecated;
      * @param {} body
      * @return {} region
      */
-    Grid._getRegion = function(grid, body) {
+    export function _getRegion(grid, body) {
         var bounds = body.bounds,
             startCol = Math.floor(bounds.min.x / grid.bucketWidth),
             endCol = Math.floor(bounds.max.x / grid.bucketWidth),
             startRow = Math.floor(bounds.min.y / grid.bucketHeight),
             endRow = Math.floor(bounds.max.y / grid.bucketHeight);
 
-        return Grid._createRegion(startCol, endCol, startRow, endRow);
+        return _createRegion(startCol, endCol, startRow, endRow);
     };
 
     /**
@@ -200,7 +194,7 @@ var deprecated = Common.deprecated;
      * @param {} endRow
      * @return {} region
      */
-    Grid._createRegion = function(startCol, endCol, startRow, endRow) {
+    export function _createRegion(startCol, endCol, startRow, endRow) {
         return { 
             id: startCol + ',' + endCol + ',' + startRow + ',' + endRow,
             startCol: startCol, 
@@ -219,7 +213,7 @@ var deprecated = Common.deprecated;
      * @param {} row
      * @return {string} bucket id
      */
-    Grid._getBucketId = function(column, row) {
+    export function _getBucketId(column, row) {
         return 'C' + column + 'R' + row;
     };
 
@@ -232,7 +226,7 @@ var deprecated = Common.deprecated;
      * @param {} bucketId
      * @return {} bucket
      */
-    Grid._createBucket = function(buckets, bucketId) {
+    export function _createBucket(buckets, bucketId) {
         var bucket = buckets[bucketId] = [];
         return bucket;
     };
@@ -246,7 +240,7 @@ var deprecated = Common.deprecated;
      * @param {} bucket
      * @param {} body
      */
-    Grid._bucketAddBody = function(grid, bucket, body) {
+    export function _bucketAddBody(grid, bucket, body) {
         var gridPairs = grid.pairs,
             pairId = Pair.id,
             bucketLength = bucket.length,
@@ -284,7 +278,7 @@ var deprecated = Common.deprecated;
      * @param {} bucket
      * @param {} body
      */
-    Grid._bucketRemoveBody = function(grid, bucket, body) {
+    export function _bucketRemoveBody(grid, bucket, body) {
         var gridPairs = grid.pairs,
             pairId = Pair.id,
             i;
@@ -313,7 +307,7 @@ var deprecated = Common.deprecated;
      * @param {} grid
      * @return [] pairs
      */
-    Grid._createActivePairsList = function(grid) {
+    export function _createActivePairsList(grid) {
         var pair,
             gridPairs = grid.pairs,
             pairKeys = Common.keys(gridPairs),
@@ -336,5 +330,3 @@ var deprecated = Common.deprecated;
 
         return pairs;
     };
-    
-})();
