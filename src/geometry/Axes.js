@@ -4,14 +4,8 @@
 * @class Axes
 */
 
-var Axes = {};
-
-module.exports = Axes;
-
-var Vector = require('../geometry/Vector');
-var Common = require('../core/Common');
-
-(function() {
+import * as Vector from '../geometry/Vector.js';
+import * as Common from '../core/Common.js';
 
     /**
      * Creates a new set of axes from the given vertices.
@@ -19,7 +13,7 @@ var Common = require('../core/Common');
      * @param {vertices} vertices
      * @return {axes} A new axes from the given vertices
      */
-    Axes.fromVertices = function(vertices) {
+    export function fromVertices(vertices) {
         var axes = {};
 
         // find the unique axes, using edge normal gradients
@@ -45,7 +39,7 @@ var Common = require('../core/Common');
      * @param {axes} axes
      * @param {number} angle
      */
-    Axes.rotate = function(axes, angle) {
+    export function rotate(axes, angle) {
         if (angle === 0)
             return;
         
@@ -60,5 +54,3 @@ var Common = require('../core/Common');
             axis.x = xx;
         }
     };
-
-})();
