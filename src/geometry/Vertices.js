@@ -8,14 +8,8 @@
 * @class Vertices
 */
 
-var Vertices = {};
-
-module.exports = Vertices;
-
-var Vector = require('../geometry/Vector');
-var Common = require('../core/Common');
-
-(function() {
+import * as Vector from '../geometry/Vector.js';
+import * as Common from '../core/Common.js';
 
     /**
      * Creates a new set of `Matter.Body` compatible vertices.
@@ -34,7 +28,7 @@ var Common = require('../core/Common');
      * @param {vector[]} points
      * @param {body} body
      */
-    Vertices.create = function(points, body) {
+    export function create(points, body) {
         var vertices = [];
 
         for (var i = 0; i < points.length; i++) {
@@ -62,7 +56,7 @@ var Common = require('../core/Common');
      * @param {body} body
      * @return {vertices} vertices
      */
-    Vertices.fromPath = function(path, body) {
+    export function fromPath(path, body) {
         var pathPattern = /L?\s*([-\d.e]+)[\s,]*([-\d.e]+)*/ig,
             points = [];
 
@@ -70,7 +64,7 @@ var Common = require('../core/Common');
             points.push({ x: parseFloat(x), y: parseFloat(y) });
         });
 
-        return Vertices.create(points, body);
+        return create(points, body);
     };
 
     /**
@@ -79,8 +73,8 @@ var Common = require('../core/Common');
      * @param {vertices} vertices
      * @return {vector} The centre point
      */
-    Vertices.centre = function(vertices) {
-        var area = Vertices.area(vertices, true),
+    export function centre(vertices) {
+        var area = area(vertices, true),
             centre = { x: 0, y: 0 },
             cross,
             temp,
@@ -102,7 +96,7 @@ var Common = require('../core/Common');
      * @param {vertices} vertices
      * @return {vector} The average point
      */
-    Vertices.mean = function(vertices) {
+    export function mean(vertices) {
         var average = { x: 0, y: 0 };
 
         for (var i = 0; i < vertices.length; i++) {
@@ -120,7 +114,7 @@ var Common = require('../core/Common');
      * @param {bool} signed
      * @return {number} The area
      */
-    Vertices.area = function(vertices, signed) {
+    export function area(vertices, signed) {
         var area = 0,
             j = vertices.length - 1;
 
@@ -142,7 +136,7 @@ var Common = require('../core/Common');
      * @param {number} mass
      * @return {number} The polygon's moment of inertia
      */
-    Vertices.inertia = function(vertices, mass) {
+    export function inertia(vertices, mass) {
         var numerator = 0,
             denominator = 0,
             v = vertices,
@@ -168,7 +162,7 @@ var Common = require('../core/Common');
      * @param {vector} vector
      * @param {number} scalar
      */
-    Vertices.translate = function(vertices, vector, scalar) {
+    export function translate(vertices, vector, scalar) {
         scalar = typeof scalar !== 'undefined' ? scalar : 1;
 
         var verticesLength = vertices.length,
@@ -191,7 +185,7 @@ var Common = require('../core/Common');
      * @param {number} angle
      * @param {vector} point
      */
-    Vertices.rotate = function(vertices, angle, point) {
+    export function rotate(vertices, angle, point) {
         if (angle === 0)
             return;
 
@@ -223,7 +217,7 @@ var Common = require('../core/Common');
      * @param {vector} point
      * @return {boolean} True if the vertices contains point, otherwise false
      */
-    Vertices.contains = function(vertices, point) {
+    export function contains(vertices, point) {
         var pointX = point.x,
             pointY = point.y,
             verticesLength = vertices.length,
@@ -252,11 +246,11 @@ var Common = require('../core/Common');
      * @param {number} scaleY
      * @param {vector} point
      */
-    Vertices.scale = function(vertices, scaleX, scaleY, point) {
+    export function scale(vertices, scaleX, scaleY, point) {
         if (scaleX === 1 && scaleY === 1)
             return vertices;
 
-        point = point || Vertices.centre(vertices);
+        point = point || centre(vertices);
 
         var vertex,
             delta;
@@ -281,7 +275,7 @@ var Common = require('../core/Common');
      * @param {number} qualityMin
      * @param {number} qualityMax
      */
-    Vertices.chamfer = function(vertices, radius, quality, qualityMin, qualityMax) {
+    export function chamfer(vertices, radius, quality, qualityMin, qualityMax) {
         if (typeof radius === 'number') {
             radius = [radius];
         } else {
@@ -351,8 +345,8 @@ var Common = require('../core/Common');
      * @param {vertices} vertices
      * @return {vertices} vertices
      */
-    Vertices.clockwiseSort = function(vertices) {
-        var centre = Vertices.mean(vertices);
+    export function clockwiseSort(vertices) {
+        var centre = mean(vertices);
 
         vertices.sort(function(vertexA, vertexB) {
             return Vector.angle(centre, vertexA) - Vector.angle(centre, vertexB);
@@ -367,7 +361,7 @@ var Common = require('../core/Common');
      * @param {vertices} vertices
      * @return {bool} `true` if the `vertices` are convex, `false` if not (or `null` if not computable).
      */
-    Vertices.isConvex = function(vertices) {
+    export function isConvex(vertices) {
         // http://paulbourke.net/geometry/polygonmesh/
         // Copyright (c) Paul Bourke (use permitted)
 
@@ -411,7 +405,7 @@ var Common = require('../core/Common');
      * @param {vertices} vertices
      * @return [vertex] vertices
      */
-    Vertices.hull = function(vertices) {
+    export function hull(vertices) {
         // http://geomalgorithms.com/a10-_hull-1.html
 
         var upper = [],
