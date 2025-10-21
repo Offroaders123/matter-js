@@ -4,18 +4,12 @@
 * @class Common
 */
 
-var Common = {};
-
-module.exports = Common;
-
-(function() {
-
-    Common._baseDelta = 1000 / 60;
-    Common._nextId = 0;
-    Common._seed = 0;
-    Common._nowStartTime = +(new Date());
-    Common._warnedOnce = {};
-    Common._decomp = null;
+    export let _baseDelta = 1000 / 60;
+    export let _nextId = 0;
+    export let _seed = 0;
+    export let _nowStartTime = +(new Date());
+    export let _warnedOnce = {};
+    export let _decomp = null;
     
     /**
      * Extends the object in the first argument using the object in the second argument.
@@ -24,7 +18,7 @@ module.exports = Common;
      * @param {boolean} deep
      * @return {} obj extended
      */
-    Common.extend = function(obj, deep) {
+    export function extend(obj, deep) {
         var argsStart,
             args,
             deepClone;
@@ -45,7 +39,7 @@ module.exports = Common;
                     if (deepClone && source[prop] && source[prop].constructor === Object) {
                         if (!obj[prop] || obj[prop].constructor === Object) {
                             obj[prop] = obj[prop] || {};
-                            Common.extend(obj[prop], deepClone, source[prop]);
+                            extend(obj[prop], deepClone, source[prop]);
                         } else {
                             obj[prop] = source[prop];
                         }
@@ -66,8 +60,8 @@ module.exports = Common;
      * @param {bool} deep
      * @return {} obj cloned
      */
-    Common.clone = function(obj, deep) {
-        return Common.extend({}, deep, obj);
+    export function clone(obj, deep) {
+        return extend({}, deep, obj);
     };
 
     /**
@@ -76,7 +70,7 @@ module.exports = Common;
      * @param {} obj
      * @return {string[]} keys
      */
-    Common.keys = function(obj) {
+    export function keys(obj) {
         if (Object.keys)
             return Object.keys(obj);
 
@@ -93,7 +87,7 @@ module.exports = Common;
      * @param {} obj
      * @return {array} Array of the objects property values
      */
-    Common.values = function(obj) {
+    export function values(obj) {
         var values = [];
         
         if (Object.keys) {
@@ -119,7 +113,7 @@ module.exports = Common;
      * @param {number} [end] Path slice end
      * @return {} The object at the given path
      */
-    Common.get = function(obj, path, begin, end) {
+    export function get(obj, path, begin, end) {
         path = path.split('.').slice(begin, end);
 
         for (var i = 0; i < path.length; i += 1) {
@@ -139,9 +133,9 @@ module.exports = Common;
      * @param {number} [end] Path slice end
      * @return {} Pass through `val` for chaining
      */
-    Common.set = function(obj, path, val, begin, end) {
+    export function set(obj, path, val, begin, end) {
         var parts = path.split('.').slice(begin, end);
-        Common.get(obj, path, 0, -1)[parts[parts.length - 1]] = val;
+        get(obj, path, 0, -1)[parts[parts.length - 1]] = val;
         return val;
     };
 
@@ -152,7 +146,7 @@ module.exports = Common;
      * @param {array} array
      * @return {array} array shuffled randomly
      */
-    Common.shuffle = function(array) {
+    export function shuffle(array) {
         for (var i = array.length - 1; i > 0; i--) {
             var j = Math.floor(Common.random() * (i + 1));
             var temp = array[i];
@@ -169,7 +163,7 @@ module.exports = Common;
      * @param {array} choices
      * @return {object} A random choice object from the array
      */
-    Common.choose = function(choices) {
+    export function choose(choices) {
         return choices[Math.floor(Common.random() * choices.length)];
     };
 
@@ -179,7 +173,7 @@ module.exports = Common;
      * @param {object} obj
      * @return {boolean} True if the object is a HTMLElement, otherwise false
      */
-    Common.isElement = function(obj) {
+    export function isElement(obj) {
         if (typeof HTMLElement !== 'undefined') {
             return obj instanceof HTMLElement;
         }
@@ -193,7 +187,7 @@ module.exports = Common;
      * @param {object} obj
      * @return {boolean} True if the object is an array, otherwise false
      */
-    Common.isArray = function(obj) {
+    export function isArray(obj) {
         return Object.prototype.toString.call(obj) === '[object Array]';
     };
 
@@ -203,7 +197,7 @@ module.exports = Common;
      * @param {object} obj
      * @return {boolean} True if the object is a function, otherwise false
      */
-    Common.isFunction = function(obj) {
+    export function isFunction(obj) {
         return typeof obj === "function";
     };
 
@@ -213,7 +207,7 @@ module.exports = Common;
      * @param {object} obj
      * @return {boolean} True if the object is a plain object, otherwise false
      */
-    Common.isPlainObject = function(obj) {
+    export function isPlainObject(obj) {
         return typeof obj === 'object' && obj.constructor === Object;
     };
 
@@ -223,7 +217,7 @@ module.exports = Common;
      * @param {object} obj
      * @return {boolean} True if the object is a string, otherwise false
      */
-    Common.isString = function(obj) {
+    export function isString(obj) {
         return toString.call(obj) === '[object String]';
     };
     
@@ -235,7 +229,7 @@ module.exports = Common;
      * @param {number} max
      * @return {number} The value clamped between min and max inclusive
      */
-    Common.clamp = function(value, min, max) {
+    export function clamp(value, min, max) {
         if (value < min)
             return min;
         if (value > max)
@@ -249,7 +243,7 @@ module.exports = Common;
      * @param {number} value
      * @return {number} -1 if negative, +1 if 0 or positive
      */
-    Common.sign = function(value) {
+    export function sign(value) {
         return value < 0 ? -1 : 1;
     };
     
@@ -259,7 +253,7 @@ module.exports = Common;
      * @method now
      * @return {number} the current timestamp in milliseconds
      */
-    Common.now = function() {
+    export function now() {
         if (typeof window !== 'undefined' && window.performance) {
             if (window.performance.now) {
                 return window.performance.now();
@@ -283,7 +277,7 @@ module.exports = Common;
      * @param {number} max
      * @return {number} A random number between min and max inclusive
      */
-    Common.random = function(min, max) {
+    export function random(min, max) {
         min = (typeof min !== "undefined") ? min : 0;
         max = (typeof max !== "undefined") ? max : 1;
         return min + _seededRandom() * (max - min);
@@ -291,8 +285,8 @@ module.exports = Common;
 
     var _seededRandom = function() {
         // https://en.wikipedia.org/wiki/Linear_congruential_generator
-        Common._seed = (Common._seed * 9301 + 49297) % 233280;
-        return Common._seed / 233280;
+        _seed = (_seed * 9301 + 49297) % 233280;
+        return _seed / 233280;
     };
 
     /**
@@ -301,7 +295,7 @@ module.exports = Common;
      * @param {string} colorString
      * @return {number} An integer representing the CSS hex string
      */
-    Common.colorToNumber = function(colorString) {
+    export function colorToNumber(colorString) {
         colorString = colorString.replace('#','');
 
         if (colorString.length == 3) {
@@ -328,7 +322,7 @@ module.exports = Common;
      * @type {Number}
      * @default 1
      */
-    Common.logLevel = 1;
+    export let logLevel = 1;
 
     /**
      * Shows a `console.log` message only if the current `Common.logLevel` allows it.
@@ -336,8 +330,8 @@ module.exports = Common;
      * @method log
      * @param ...objs {} The objects to log.
      */
-    Common.log = function() {
-        if (console && Common.logLevel > 0 && Common.logLevel <= 3) {
+    export function log() {
+        if (console && logLevel > 0 && logLevel <= 3) {
             console.log.apply(console, ['matter-js:'].concat(Array.prototype.slice.call(arguments)));
         }
     };
@@ -348,8 +342,8 @@ module.exports = Common;
      * @method info
      * @param ...objs {} The objects to log.
      */
-    Common.info = function() {
-        if (console && Common.logLevel > 0 && Common.logLevel <= 2) {
+    export function info() {
+        if (console && logLevel > 0 && logLevel <= 2) {
             console.info.apply(console, ['matter-js:'].concat(Array.prototype.slice.call(arguments)));
         }
     };
@@ -360,8 +354,8 @@ module.exports = Common;
      * @method warn
      * @param ...objs {} The objects to log.
      */
-    Common.warn = function() {
-        if (console && Common.logLevel > 0 && Common.logLevel <= 3) {
+    export function warn() {
+        if (console && logLevel > 0 && logLevel <= 3) {
             console.warn.apply(console, ['matter-js:'].concat(Array.prototype.slice.call(arguments)));
         }
     };
@@ -371,12 +365,12 @@ module.exports = Common;
      * @method warnOnce
      * @param ...objs {} The objects to log.
      */
-    Common.warnOnce = function() {
+    export function warnOnce() {
         var message = Array.prototype.slice.call(arguments).join(' ');
 
-        if (!Common._warnedOnce[message]) {
-            Common.warn(message);
-            Common._warnedOnce[message] = true;
+        if (!_warnedOnce[message]) {
+            warn(message);
+            _warnedOnce[message] = true;
         }
     };
 
@@ -389,9 +383,9 @@ module.exports = Common;
      * @param {string} name The property name of the function on obj
      * @param {string} warning The one-time message to show if the function is called
      */
-    Common.deprecated = function(obj, prop, warning) {
-        obj[prop] = Common.chain(function() {
-            Common.warnOnce('🔅 deprecated 🔅', warning);
+    export function deprecated(obj, prop, warning) {
+        obj[prop] = chain(function() {
+            warnOnce('🔅 deprecated 🔅', warning);
         }, obj[prop]);
     };
 
@@ -400,8 +394,8 @@ module.exports = Common;
      * @method nextId
      * @return {Number} Unique sequential ID
      */
-    Common.nextId = function() {
-        return Common._nextId++;
+    export function nextId() {
+        return _nextId++;
     };
 
     /**
@@ -411,7 +405,7 @@ module.exports = Common;
      * @param {object} needle
      * @return {number} The position of needle in haystack, otherwise -1.
      */
-    Common.indexOf = function(haystack, needle) {
+    export function indexOf(haystack, needle) {
         if (haystack.indexOf)
             return haystack.indexOf(needle);
 
@@ -430,7 +424,7 @@ module.exports = Common;
      * @param {function} func
      * @return {array} Values from list transformed by func.
      */
-    Common.map = function(list, func) {
+    export function map(list, func) {
         if (list.map) {
             return list.map(func);
         }
@@ -451,7 +445,7 @@ module.exports = Common;
      * @param {object} graph
      * @return {array} Partially ordered set of vertices in topological order.
      */
-    Common.topologicalSort = function(graph) {
+    export function topologicalSort(graph) {
         // https://github.com/mgechev/javascript-algorithms
         // Copyright (c) Minko Gechev (MIT license)
         // Modifications: tidy formatting and naming
@@ -468,7 +462,7 @@ module.exports = Common;
         return result;
     };
 
-    Common._topologicalSort = function(node, visited, temp, graph, result) {
+    export function _topologicalSort(node, visited, temp, graph, result) {
         var neighbors = graph[node] || [];
         temp[node] = true;
 
@@ -481,7 +475,7 @@ module.exports = Common;
             }
 
             if (!visited[neighbor]) {
-                Common._topologicalSort(neighbor, visited, temp, graph, result);
+                _topologicalSort(neighbor, visited, temp, graph, result);
             }
         }
 
@@ -502,7 +496,7 @@ module.exports = Common;
      * @param ...funcs {function} The functions to chain.
      * @return {function} A new function that calls the passed functions in order.
      */
-    Common.chain = function() {
+    export function chain() {
         var funcs = [];
 
         for (var i = 0; i < arguments.length; i += 1) {
@@ -550,10 +544,10 @@ module.exports = Common;
      * @param {function} func The function to chain before the original
      * @return {function} The chained function that replaced the original
      */
-    Common.chainPathBefore = function(base, path, func) {
-        return Common.set(base, path, Common.chain(
+    export function chainPathBefore(base, path, func) {
+        return set(base, path, chain(
             func,
-            Common.get(base, path)
+            get(base, path)
         ));
     };
 
@@ -566,9 +560,9 @@ module.exports = Common;
      * @param {function} func The function to chain after the original
      * @return {function} The chained function that replaced the original
      */
-    Common.chainPathAfter = function(base, path, func) {
-        return Common.set(base, path, Common.chain(
-            Common.get(base, path),
+    export function chainPathAfter(base, path, func) {
+        return set(base, path, chain(
+            get(base, path),
             func
         ));
     };
@@ -579,8 +573,8 @@ module.exports = Common;
      * @method setDecomp
      * @param {} decomp The [poly-decomp](https://github.com/schteppe/poly-decomp.js) library module.
      */
-    Common.setDecomp = function(decomp) {
-        Common._decomp = decomp;
+    export function setDecomp(decomp) {
+        _decomp = decomp;
     };
 
     /**
@@ -589,9 +583,9 @@ module.exports = Common;
      * @method getDecomp
      * @return {} The [poly-decomp](https://github.com/schteppe/poly-decomp.js) library module if provided.
      */
-    Common.getDecomp = function() {
+    export function getDecomp() {
         // get user provided decomp if set
-        var decomp = Common._decomp;
+        var decomp = _decomp;
 
         try {
             // otherwise from window global
@@ -610,4 +604,3 @@ module.exports = Common;
 
         return decomp;
     };
-})();
