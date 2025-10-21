@@ -7,25 +7,19 @@
 * @class Body
 */
 
-var Body = {};
+import * as Vertices from '../geometry/Vertices.js';
+import * as Vector from '../geometry/Vector.js';
+import * as Sleeping from '../core/Sleeping.js';
+import * as Common from '../core/Common.js';
+import * as Bounds from '../geometry/Bounds.js';
+import * as Axes from '../geometry/Axes.js';
 
-module.exports = Body;
-
-var Vertices = require('../geometry/Vertices');
-var Vector = require('../geometry/Vector');
-var Sleeping = require('../core/Sleeping');
-var Common = require('../core/Common');
-var Bounds = require('../geometry/Bounds');
-var Axes = require('../geometry/Axes');
-
-(function() {
-
-    Body._timeCorrection = true;
-    Body._inertiaScale = 4;
-    Body._nextCollidingGroupId = 1;
-    Body._nextNonCollidingGroupId = -1;
-    Body._nextCategory = 0x0001;
-    Body._baseDelta = 1000 / 60;
+    export let _timeCorrection = true;
+    export let _inertiaScale = 4;
+    export let _nextCollidingGroupId = 1;
+    export let _nextNonCollidingGroupId = -1;
+    export let _nextCategory = 0x0001;
+    export let _baseDelta = 1000 / 60;
 
     /**
      * Creates a new rigid body model. The options parameter is an object that specifies any properties you wish to override the defaults.
@@ -36,7 +30,7 @@ var Axes = require('../geometry/Axes');
      * @param {} options
      * @return {body} body
      */
-    Body.create = function(options) {
+    export function create(options) {
         var defaults = {
             id: Common.nextId(),
             type: 'body',
@@ -115,11 +109,11 @@ var Axes = require('../geometry/Axes');
      * @param {bool} [isNonColliding=false]
      * @return {Number} Unique group index
      */
-    Body.nextGroup = function(isNonColliding) {
+    export function nextGroup(isNonColliding) {
         if (isNonColliding)
-            return Body._nextNonCollidingGroupId--;
+            return _nextNonCollidingGroupId--;
 
-        return Body._nextCollidingGroupId++;
+        return _nextCollidingGroupId++;
     };
 
     /**
@@ -128,9 +122,9 @@ var Axes = require('../geometry/Axes');
      * @method nextCategory
      * @return {Number} Unique category bitfield
      */
-    Body.nextCategory = function() {
-        Body._nextCategory = Body._nextCategory << 1;
-        return Body._nextCategory;
+    export function nextCategory() {
+        _nextCategory = _nextCategory << 1;
+        return _nextCategory;
     };
 
     /**
@@ -144,7 +138,7 @@ var Axes = require('../geometry/Axes');
         options = options || {};
 
         // init required properties (order is important)
-        Body.set(body, {
+        set(body, {
             bounds: body.bounds || Bounds.create(body.vertices),
             positionPrev: body.positionPrev || Vector.clone(body.position),
             anglePrev: body.anglePrev || body.angle,
@@ -160,7 +154,7 @@ var Axes = require('../geometry/Axes');
         Bounds.update(body.bounds, body.vertices, body.velocity);
 
         // allow options to override the automatically calculated properties
-        Body.set(body, {
+        set(body, {
             axes: options.axes || body.axes,
             area: options.area || body.area,
             mass: options.mass || body.mass,
@@ -186,7 +180,7 @@ var Axes = require('../geometry/Axes');
      * @param {} settings A property name (or map of properties and values) to set on the body.
      * @param {} value The value to set if `settings` is a single property name.
      */
-    Body.set = function(body, settings, value) {
+    export function set(body, settings, value) {
         var property;
 
         if (typeof settings === 'string') {
@@ -203,46 +197,46 @@ var Axes = require('../geometry/Axes');
             switch (property) {
 
             case 'isStatic':
-                Body.setStatic(body, value);
+                setStatic(body, value);
                 break;
             case 'isSleeping':
                 Sleeping.set(body, value);
                 break;
             case 'mass':
-                Body.setMass(body, value);
+                setMass(body, value);
                 break;
             case 'density':
-                Body.setDensity(body, value);
+                setDensity(body, value);
                 break;
             case 'inertia':
-                Body.setInertia(body, value);
+                setInertia(body, value);
                 break;
             case 'vertices':
-                Body.setVertices(body, value);
+                setVertices(body, value);
                 break;
             case 'position':
-                Body.setPosition(body, value);
+                setPosition(body, value);
                 break;
             case 'angle':
-                Body.setAngle(body, value);
+                setAngle(body, value);
                 break;
             case 'velocity':
-                Body.setVelocity(body, value);
+                setVelocity(body, value);
                 break;
             case 'angularVelocity':
-                Body.setAngularVelocity(body, value);
+                setAngularVelocity(body, value);
                 break;
             case 'speed':
-                Body.setSpeed(body, value);
+                setSpeed(body, value);
                 break;
             case 'angularSpeed':
-                Body.setAngularSpeed(body, value);
+                setAngularSpeed(body, value);
                 break;
             case 'parts':
-                Body.setParts(body, value);
+                setParts(body, value);
                 break;
             case 'centre':
-                Body.setCentre(body, value);
+                setCentre(body, value);
                 break;
             default:
                 body[property] = value;
@@ -257,7 +251,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {bool} isStatic
      */
-    Body.setStatic = function(body, isStatic) {
+    export function setStatic(body, isStatic) {
         for (var i = 0; i < body.parts.length; i++) {
             var part = body.parts[i];
 
@@ -308,7 +302,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} mass
      */
-    Body.setMass = function(body, mass) {
+    export function setMass(body, mass) {
         var moment = body.inertia / (body.mass / 6);
         body.inertia = moment * (mass / 6);
         body.inverseInertia = 1 / body.inertia;
@@ -324,8 +318,8 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} density
      */
-    Body.setDensity = function(body, density) {
-        Body.setMass(body, density * body.area);
+    export function setDensity(body, density) {
+        setMass(body, density * body.area);
         body.density = density;
     };
 
@@ -336,7 +330,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} inertia
      */
-    Body.setInertia = function(body, inertia) {
+    export function setInertia(body, inertia) {
         body.inertia = inertia;
         body.inverseInertia = 1 / body.inertia;
     };
@@ -353,7 +347,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {vector[]} vertices
      */
-    Body.setVertices = function(body, vertices) {
+    export function setVertices(body, vertices) {
         // change vertices
         if (vertices[0].body === body) {
             body.vertices = vertices;
@@ -364,14 +358,14 @@ var Axes = require('../geometry/Axes');
         // update properties
         body.axes = Axes.fromVertices(body.vertices);
         body.area = Vertices.area(body.vertices);
-        Body.setMass(body, body.density * body.area);
+        setMass(body, body.density * body.area);
 
         // orient vertices around the centre of mass at origin (0, 0)
         var centre = Vertices.centre(body.vertices);
         Vertices.translate(body.vertices, centre, -1);
 
         // update inertia while vertices are at origin (0, 0)
-        Body.setInertia(body, Body._inertiaScale * Vertices.inertia(body.vertices, body.mass));
+        setInertia(body, _inertiaScale * Vertices.inertia(body.vertices, body.mass));
 
         // update geometry
         Vertices.translate(body.vertices, body.position);
@@ -395,7 +389,7 @@ var Axes = require('../geometry/Axes');
      * @param {body[]} parts
      * @param {bool} [autoHull=true]
      */
-    Body.setParts = function(body, parts, autoHull) {
+    export function setParts(body, parts, autoHull) {
         var i;
 
         // add all the parts, ensuring that the first part is always the parent body
@@ -429,12 +423,12 @@ var Axes = require('../geometry/Axes');
             var hull = Vertices.hull(vertices),
                 hullCentre = Vertices.centre(hull);
 
-            Body.setVertices(body, hull);
+            setVertices(body, hull);
             Vertices.translate(body.vertices, hullCentre);
         }
 
         // sum the properties of all compound parts of the parent body
-        var total = Body._totalProperties(body);
+        var total = _totalProperties(body);
 
         body.area = total.area;
         body.parent = body;
@@ -443,9 +437,9 @@ var Axes = require('../geometry/Axes');
         body.positionPrev.x = total.centre.x;
         body.positionPrev.y = total.centre.y;
 
-        Body.setMass(body, total.mass);
-        Body.setInertia(body, total.inertia);
-        Body.setPosition(body, total.centre);
+        setMass(body, total.mass);
+        setInertia(body, total.inertia);
+        setPosition(body, total.centre);
     };
 
     /**
@@ -459,7 +453,7 @@ var Axes = require('../geometry/Axes');
      * @param {vector} centre
      * @param {bool} relative
      */
-    Body.setCentre = function(body, centre, relative) {
+    export function setCentre(body, centre, relative) {
         if (!relative) {
             body.positionPrev.x = centre.x - (body.position.x - body.positionPrev.x);
             body.positionPrev.y = centre.y - (body.position.y - body.positionPrev.y);
@@ -481,7 +475,7 @@ var Axes = require('../geometry/Axes');
      * @param {vector} position
      * @param {boolean} [updateVelocity=false]
      */
-    Body.setPosition = function(body, position, updateVelocity) {
+    export function setPosition(body, position, updateVelocity) {
         var delta = Vector.sub(position, body.position);
 
         if (updateVelocity) {
@@ -512,7 +506,7 @@ var Axes = require('../geometry/Axes');
      * @param {number} angle
      * @param {boolean} [updateVelocity=false]
      */
-    Body.setAngle = function(body, angle, updateVelocity) {
+    export function setAngle(body, angle, updateVelocity) {
         var delta = angle - body.angle;
         
         if (updateVelocity) {
@@ -542,8 +536,8 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {vector} velocity
      */
-    Body.setVelocity = function(body, velocity) {
-        var timeScale = body.deltaTime / Body._baseDelta;
+    export function setVelocity(body, velocity) {
+        var timeScale = body.deltaTime / _baseDelta;
         body.positionPrev.x = body.position.x - velocity.x * timeScale;
         body.positionPrev.y = body.position.y - velocity.y * timeScale;
         body.velocity.x = (body.position.x - body.positionPrev.x) / timeScale;
@@ -557,8 +551,8 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @return {vector} velocity
      */
-    Body.getVelocity = function(body) {
-        var timeScale = Body._baseDelta / body.deltaTime;
+    export function getVelocity(body) {
+        var timeScale = _baseDelta / body.deltaTime;
 
         return {
             x: (body.position.x - body.positionPrev.x) * timeScale,
@@ -573,8 +567,8 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @return {number} speed
      */
-    Body.getSpeed = function(body) {
-        return Vector.magnitude(Body.getVelocity(body));
+    export function getSpeed(body) {
+        return Vector.magnitude(getVelocity(body));
     };
 
     /**
@@ -584,8 +578,8 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} speed
      */
-    Body.setSpeed = function(body, speed) {
-        Body.setVelocity(body, Vector.mult(Vector.normalise(Body.getVelocity(body)), speed));
+    export function setSpeed(body, speed) {
+        setVelocity(body, Vector.mult(Vector.normalise(getVelocity(body)), speed));
     };
 
     /**
@@ -595,8 +589,8 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} velocity
      */
-    Body.setAngularVelocity = function(body, velocity) {
-        var timeScale = body.deltaTime / Body._baseDelta;
+    export function setAngularVelocity(body, velocity) {
+        var timeScale = body.deltaTime / _baseDelta;
         body.anglePrev = body.angle - velocity * timeScale;
         body.angularVelocity = (body.angle - body.anglePrev) / timeScale;
         body.angularSpeed = Math.abs(body.angularVelocity);
@@ -608,8 +602,8 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @return {number} angular velocity
      */
-    Body.getAngularVelocity = function(body) {
-        return (body.angle - body.anglePrev) * Body._baseDelta / body.deltaTime;
+    export function getAngularVelocity(body) {
+        return (body.angle - body.anglePrev) * _baseDelta / body.deltaTime;
     };
 
     /**
@@ -619,8 +613,8 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @return {number} angular speed
      */
-    Body.getAngularSpeed = function(body) {
-        return Math.abs(Body.getAngularVelocity(body));
+    export function getAngularSpeed(body) {
+        return Math.abs(getAngularVelocity(body));
     };
 
     /**
@@ -630,8 +624,8 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} speed
      */
-    Body.setAngularSpeed = function(body, speed) {
-        Body.setAngularVelocity(body, Common.sign(Body.getAngularVelocity(body)) * speed);
+    export function setAngularSpeed(body, speed) {
+        setAngularVelocity(body, Common.sign(getAngularVelocity(body)) * speed);
     };
 
     /**
@@ -642,8 +636,8 @@ var Axes = require('../geometry/Axes');
      * @param {vector} translation
      * @param {boolean} [updateVelocity=false]
      */
-    Body.translate = function(body, translation, updateVelocity) {
-        Body.setPosition(body, Vector.add(body.position, translation), updateVelocity);
+    export function translate(body, translation, updateVelocity) {
+        setPosition(body, Vector.add(body.position, translation), updateVelocity);
     };
 
     /**
@@ -655,21 +649,21 @@ var Axes = require('../geometry/Axes');
      * @param {vector} [point]
      * @param {boolean} [updateVelocity=false]
      */
-    Body.rotate = function(body, rotation, point, updateVelocity) {
+    export function rotate(body, rotation, point, updateVelocity) {
         if (!point) {
-            Body.setAngle(body, body.angle + rotation, updateVelocity);
+            setAngle(body, body.angle + rotation, updateVelocity);
         } else {
             var cos = Math.cos(rotation),
                 sin = Math.sin(rotation),
                 dx = body.position.x - point.x,
                 dy = body.position.y - point.y;
                 
-            Body.setPosition(body, {
+            setPosition(body, {
                 x: point.x + (dx * cos - dy * sin),
                 y: point.y + (dx * sin + dy * cos)
             }, updateVelocity);
 
-            Body.setAngle(body, body.angle + rotation, updateVelocity);
+            setAngle(body, body.angle + rotation, updateVelocity);
         }
     };
 
@@ -681,7 +675,7 @@ var Axes = require('../geometry/Axes');
      * @param {number} scaleY
      * @param {vector} [point]
      */
-    Body.scale = function(body, scaleX, scaleY, point) {
+    export function scale(body, scaleX, scaleY, point) {
         var totalArea = 0,
             totalInertia = 0;
 
@@ -696,11 +690,11 @@ var Axes = require('../geometry/Axes');
             // update properties
             part.axes = Axes.fromVertices(part.vertices);
             part.area = Vertices.area(part.vertices);
-            Body.setMass(part, body.density * part.area);
+            setMass(part, body.density * part.area);
 
             // update inertia (requires vertices to be at origin)
             Vertices.translate(part.vertices, { x: -part.position.x, y: -part.position.y });
-            Body.setInertia(part, Body._inertiaScale * Vertices.inertia(part.vertices, part.mass));
+            setInertia(part, _inertiaScale * Vertices.inertia(part.vertices, part.mass));
             Vertices.translate(part.vertices, { x: part.position.x, y: part.position.y });
 
             if (i > 0) {
@@ -721,8 +715,8 @@ var Axes = require('../geometry/Axes');
             body.area = totalArea;
 
             if (!body.isStatic) {
-                Body.setMass(body, body.density * totalArea);
-                Body.setInertia(body, totalInertia);
+                setMass(body, body.density * totalArea);
+                setInertia(body, totalInertia);
             }
         }
 
@@ -744,11 +738,11 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @param {number} [deltaTime=16.666]
      */
-    Body.update = function(body, deltaTime) {
+    export function update(body, deltaTime) {
         deltaTime = (typeof deltaTime !== 'undefined' ? deltaTime : (1000 / 60)) * body.timeScale;
 
         var deltaTimeSquared = deltaTime * deltaTime,
-            correction = Body._timeCorrection ? deltaTime / (body.deltaTime || deltaTime) : 1;
+            correction = _timeCorrection ? deltaTime / (body.deltaTime || deltaTime) : 1;
 
         // from the previous step
         var frictionAir = 1 - body.frictionAir * (deltaTime / Common._baseDelta),
@@ -798,8 +792,8 @@ var Axes = require('../geometry/Axes');
      * @method updateVelocities
      * @param {body} body
      */
-    Body.updateVelocities = function(body) {
-        var timeScale = Body._baseDelta / body.deltaTime,
+    export function updateVelocities(body) {
+        var timeScale = _baseDelta / body.deltaTime,
             bodyVelocity = body.velocity;
 
         bodyVelocity.x = (body.position.x - body.positionPrev.x) * timeScale;
@@ -829,7 +823,7 @@ var Axes = require('../geometry/Axes');
      * @param {vector} position The force origin in world-space. Pass `body.position` to avoid angular torque.
      * @param {vector} force
      */
-    Body.applyForce = function(body, position, force) {
+    export function applyForce(body, position, force) {
         var offset = { x: position.x - body.position.x, y: position.y - body.position.y };
         body.force.x += force.x;
         body.force.y += force.y;
@@ -843,7 +837,7 @@ var Axes = require('../geometry/Axes');
      * @param {body} body
      * @return {}
      */
-    Body._totalProperties = function(body) {
+    export function _totalProperties(body) {
         // from equations at:
         // https://ecourses.ou.edu/cgi-bin/ebook.cgi?doc=&topic=st&chap_sec=07.2&page=theory
         // http://output.to/sideway/default.asp?qno=121100087
@@ -1475,5 +1469,3 @@ var Axes = require('../geometry/Axes');
      * @property chamfer
      * @type object|null|undefined
      */
-
-})();
