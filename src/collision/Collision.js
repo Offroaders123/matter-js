@@ -8,14 +8,9 @@
 * @class Collision
 */
 
-var Collision = {};
+import * as Vertices from '../geometry/Vertices.js';
+import * as Pair from './Pair.js';
 
-module.exports = Collision;
-
-var Vertices = require('../geometry/Vertices');
-var Pair = require('./Pair');
-
-(function() {
     var _supports = [];
 
     var _overlapAB = {
@@ -35,7 +30,7 @@ var Pair = require('./Pair');
      * @param {body} bodyB The second body part represented by the collision record
      * @return {collision} A new collision record
      */
-    Collision.create = function(bodyA, bodyB) {
+    export function create(bodyA, bodyB) {
         return { 
             pair: null,
             collided: false,
@@ -60,14 +55,14 @@ var Pair = require('./Pair');
      * @param {pairs} [pairs] Optionally reuse collision records from existing pairs.
      * @return {collision|null} A collision record if detected, otherwise null
      */
-    Collision.collides = function(bodyA, bodyB, pairs) {
-        Collision._overlapAxes(_overlapAB, bodyA.vertices, bodyB.vertices, bodyA.axes);
+    export function collides(bodyA, bodyB, pairs) {
+        _overlapAxes(_overlapAB, bodyA.vertices, bodyB.vertices, bodyA.axes);
 
         if (_overlapAB.overlap <= 0) {
             return null;
         }
 
-        Collision._overlapAxes(_overlapBA, bodyB.vertices, bodyA.vertices, bodyB.axes);
+        _overlapAxes(_overlapBA, bodyB.vertices, bodyA.vertices, bodyB.axes);
 
         if (_overlapBA.overlap <= 0) {
             return null;
@@ -78,7 +73,7 @@ var Pair = require('./Pair');
             collision;
 
         if (!pair) {
-            collision = Collision.create(bodyA, bodyB);
+            collision = create(bodyA, bodyB);
             collision.collided = true;
             collision.bodyA = bodyA.id < bodyB.id ? bodyA : bodyB;
             collision.bodyB = bodyA.id < bodyB.id ? bodyB : bodyA;
@@ -128,7 +123,7 @@ var Pair = require('./Pair');
         collision.depth = depth;
 
         // find support points, there is always either exactly one or two
-        var supportsB = Collision._findSupports(bodyA, bodyB, normal, 1),
+        var supportsB = _findSupports(bodyA, bodyB, normal, 1),
             supportCount = 0;
 
         // find the supports from bodyB that are inside bodyA
@@ -142,7 +137,7 @@ var Pair = require('./Pair');
 
         // find the supports from bodyA that are inside bodyB
         if (supportCount < 2) {
-            var supportsA = Collision._findSupports(bodyB, bodyA, normal, -1);
+            var supportsA = _findSupports(bodyB, bodyA, normal, -1);
 
             if (Vertices.contains(bodyB.vertices, supportsA[0])) {
                 supports[supportCount++] = supportsA[0];
@@ -173,7 +168,7 @@ var Pair = require('./Pair');
      * @param {vertices} verticesB
      * @param {axes} axes
      */
-    Collision._overlapAxes = function(result, verticesA, verticesB, axes) {
+    export function _overlapAxes(result, verticesA, verticesB, axes) {
         var verticesALength = verticesA.length,
             verticesBLength = verticesB.length,
             verticesAX = verticesA[0].x,
@@ -248,7 +243,7 @@ var Pair = require('./Pair');
      * @param {number} direction
      * @return [vector]
      */
-    Collision._findSupports = function(bodyA, bodyB, normal, direction) {
+    export function _findSupports(bodyA, bodyB, normal, direction) {
         var vertices = bodyB.vertices,
             verticesLength = vertices.length,
             bodyAPositionX = bodyA.position.x,
@@ -399,5 +394,3 @@ var Pair = require('./Pair');
      * @type number
      * @default 0
      */
-
-})();
