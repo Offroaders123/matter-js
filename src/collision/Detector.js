@@ -4,14 +4,8 @@
 * @class Detector
 */
 
-var Detector = {};
-
-module.exports = Detector;
-
-var Common = require('../core/Common');
-var Collision = require('./Collision');
-
-(function() {
+import * as Common from '../core/Common.js';
+import * as Collision from './Collision.js';
 
     /**
      * Creates a new collision detector.
@@ -19,7 +13,7 @@ var Collision = require('./Collision');
      * @param {} options
      * @return {detector} A new collision detector
      */
-    Detector.create = function(options) {
+    export function create(options) {
         var defaults = {
             bodies: [],
             collisions: [],
@@ -35,7 +29,7 @@ var Collision = require('./Collision');
      * @param {detector} detector
      * @param {body[]} bodies
      */
-    Detector.setBodies = function(detector, bodies) {
+    export function setBodies(detector, bodies) {
         detector.bodies = bodies.slice(0);
     };
 
@@ -44,7 +38,7 @@ var Collision = require('./Collision');
      * @method clear
      * @param {detector} detector
      */
-    Detector.clear = function(detector) {
+    export function clear(detector) {
         detector.bodies = [];
         detector.collisions = [];
     };
@@ -58,18 +52,18 @@ var Collision = require('./Collision');
      * @param {detector} detector
      * @return {collision[]} collisions
      */
-    Detector.collisions = function(detector) {
+    export function collisions(detector) {
         var pairs = detector.pairs,
             bodies = detector.bodies,
             bodiesLength = bodies.length,
-            canCollide = Detector.canCollide,
+            // canCollide = canCollide,
             collides = Collision.collides,
             collisions = detector.collisions,
             collisionIndex = 0,
             i,
             j;
 
-        bodies.sort(Detector._compareBoundsX);
+        bodies.sort(_compareBoundsX);
 
         for (i = 0; i < bodiesLength; i++) {
             var bodyA = bodies[i],
@@ -152,7 +146,7 @@ var Collision = require('./Collision');
      * @param {} filterB
      * @return {bool} `true` if collision can occur
      */
-    Detector.canCollide = function(filterA, filterB) {
+    export function canCollide(filterA, filterB) {
         if (filterA.group === filterB.group && filterA.group !== 0)
             return filterA.group > 0;
 
@@ -168,7 +162,7 @@ var Collision = require('./Collision');
      * @param {body} bodyB
      * @return {number} The signed delta used for sorting
      */
-    Detector._compareBoundsX = function(bodyA, bodyB) {
+    export function _compareBoundsX(bodyA, bodyB) {
         return bodyA.bounds.min.x - bodyB.bounds.min.x;
     };
 
@@ -200,5 +194,3 @@ var Collision = require('./Collision');
      * @type {pairs|null}
      * @default null
      */
-
-})();
