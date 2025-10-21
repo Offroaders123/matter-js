@@ -4,14 +4,8 @@
 * @class Pairs
 */
 
-var Pairs = {};
-
-module.exports = Pairs;
-
-var Pair = require('./Pair');
-var Common = require('../core/Common');
-
-(function() {
+import * as Pair from './Pair.js';
+import * as Common from '../core/Common.js';
 
     /**
      * Creates a new pairs structure.
@@ -19,7 +13,7 @@ var Common = require('../core/Common');
      * @param {object} options
      * @return {pairs} A new pairs structure
      */
-    Pairs.create = function(options) {
+    export function create(options) {
         return Common.extend({ 
             table: {},
             list: [],
@@ -36,7 +30,7 @@ var Common = require('../core/Common');
      * @param {collision[]} collisions
      * @param {number} timestamp
      */
-    Pairs.update = function(pairs, collisions, timestamp) {
+    export function update(pairs, collisions, timestamp) {
         var pairUpdate = Pair.update,
             pairCreate = Pair.create,
             pairSetActive = Pair.setActive,
@@ -128,7 +122,7 @@ var Common = require('../core/Common');
      * @param {pairs} pairs
      * @return {pairs} pairs
      */
-    Pairs.clear = function(pairs) {
+    export function clear(pairs) {
         pairs.table = {};
         pairs.list.length = 0;
         pairs.collisionStart.length = 0;
@@ -136,5 +130,3 @@ var Common = require('../core/Common');
         pairs.collisionEnd.length = 0;
         return pairs;
     };
-
-})();
