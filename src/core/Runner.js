@@ -10,22 +10,16 @@
 * @class Runner
 */
 
-var Runner = {};
+import * as Events from './Events.js';
+import * as Engine from './Engine.js';
+import * as Common from './Common.js';
 
-module.exports = Runner;
-
-var Events = require('./Events');
-var Engine = require('./Engine');
-var Common = require('./Common');
-
-(function() {
-
-    Runner._maxFrameDelta = 1000 / 15;
-    Runner._frameDeltaFallback = 1000 / 60;
-    Runner._timeBufferMargin = 1.5;
-    Runner._elapsedNextEstimate = 1;
-    Runner._smoothingLowerBound = 0.1;
-    Runner._smoothingUpperBound = 0.9;
+    export let _maxFrameDelta = 1000 / 15;
+    export let _frameDeltaFallback = 1000 / 60;
+    export let _timeBufferMargin = 1.5;
+    export let _elapsedNextEstimate = 1;
+    export let _smoothingLowerBound = 0.1;
+    export let _smoothingUpperBound = 0.9;
 
     /**
      * Creates a new Runner. 
@@ -33,7 +27,7 @@ var Common = require('./Common');
      * @method create
      * @param {} options
      */
-    Runner.create = function(options) {
+    export function create(options) {
         var defaults = {
             delta: 1000 / 60,
             frameDelta: null,
@@ -67,15 +61,15 @@ var Common = require('./Common');
      * @param {engine} [engine]
      * @return {runner} runner
      */
-    Runner.run = function(runner, engine) {
+    export function run(runner, engine) {
         // initial time buffer for the first frame
-        runner.timeBuffer = Runner._frameDeltaFallback;
+        runner.timeBuffer = _frameDeltaFallback;
 
         (function onFrame(time){
-            runner.frameRequestId = Runner._onNextFrame(runner, onFrame);
+            runner.frameRequestId = _onNextFrame(runner, onFrame);
 
             if (time && runner.enabled) {
-                Runner.tick(runner, engine, time);
+                tick(runner, engine, time);
             }
         })();
 
@@ -91,7 +85,7 @@ var Common = require('./Common');
      * @param {engine} engine
      * @param {number} time
      */
-    Runner.tick = function(runner, engine, time) {
+    export function tick(runner, engine, time) {
         var tickStartTime = Common.now(),
             engineDelta = runner.delta,
             updateCount = 0;
@@ -100,9 +94,9 @@ var Common = require('./Common');
         var frameDelta = time - runner.timeLastTick;
 
         // fallback for unusable frame delta values (e.g. 0, NaN, on first frame or long pauses)
-        if (!frameDelta || !runner.timeLastTick || frameDelta > Math.max(Runner._maxFrameDelta, runner.maxFrameTime)) {
+        if (!frameDelta || !runner.timeLastTick || frameDelta > Math.max(_maxFrameDelta, runner.maxFrameTime)) {
             // reuse last accepted frame delta else fallback
-            frameDelta = runner.frameDelta || Runner._frameDeltaFallback;
+            frameDelta = runner.frameDelta || _frameDeltaFallback;
         }
 
         if (runner.frameDeltaSmoothing) {
@@ -115,8 +109,8 @@ var Common = require('./Common');
 
             // sample a central window to limit outliers
             var deltaHistoryWindow = runner.frameDeltaHistory.slice(
-                deltaHistorySorted.length * Runner._smoothingLowerBound, 
-                deltaHistorySorted.length * Runner._smoothingUpperBound
+                deltaHistorySorted.length * _smoothingLowerBound, 
+                deltaHistorySorted.length * _smoothingUpperBound
             );
 
             // take the mean of the central window
@@ -138,7 +132,7 @@ var Common = require('./Common');
 
         // limit time buffer size to a single frame of updates
         runner.timeBuffer = Common.clamp(
-            runner.timeBuffer, 0, runner.frameDelta + engineDelta * Runner._timeBufferMargin
+            runner.timeBuffer, 0, runner.frameDelta + engineDelta * _timeBufferMargin
         );
 
         // reset count of over budget updates
@@ -159,7 +153,7 @@ var Common = require('./Common');
         var updateStartTime = Common.now();
 
         // simulate time elapsed between calls
-        while (engineDelta > 0 && runner.timeBuffer >= engineDelta * Runner._timeBufferMargin) {
+        while (engineDelta > 0 && runner.timeBuffer >= engineDelta * _timeBufferMargin) {
             // update the engine
             Events.trigger(runner, 'beforeUpdate', event);
             Engine.update(engine, engineDelta);
@@ -172,11 +166,11 @@ var Common = require('./Common');
             // find elapsed time during this tick
             var elapsedTimeTotal = Common.now() - tickStartTime,
                 elapsedTimeUpdates = Common.now() - updateStartTime,
-                elapsedNextEstimate = elapsedTimeTotal + Runner._elapsedNextEstimate * elapsedTimeUpdates / updateCount;
+                elapsedNextEstimate = elapsedTimeTotal + _elapsedNextEstimate * elapsedTimeUpdates / updateCount;
 
             // defer updates if over performance budgets for this frame
             if (updateCount >= maxUpdates || elapsedNextEstimate > runner.maxFrameTime) {
-                runner.lastUpdatesDeferred = Math.round(Math.max(0, (runner.timeBuffer / engineDelta) - Runner._timeBufferMargin));
+                runner.lastUpdatesDeferred = Math.round(Math.max(0, (runner.timeBuffer / engineDelta) - _timeBufferMargin));
                 break;
             }
         }
@@ -215,8 +209,8 @@ var Common = require('./Common');
      * @method stop
      * @param {runner} runner
      */
-    Runner.stop = function(runner) {
-        Runner._cancelNextFrame(runner);
+    export function stop(runner) {
+        _cancelNextFrame(runner);
     };
 
     /**
@@ -227,7 +221,7 @@ var Common = require('./Common');
      * @param {function} callback
      * @return {number} frameRequestId
      */
-    Runner._onNextFrame = function(runner, callback) {
+    export function _onNextFrame(runner, callback) {
         if (typeof window !== 'undefined' && window.requestAnimationFrame) {
             runner.frameRequestId = window.requestAnimationFrame(callback);
         } else {
@@ -243,7 +237,7 @@ var Common = require('./Common');
      * @method _cancelNextFrame
      * @param {runner} runner
      */
-    Runner._cancelNextFrame = function(runner) {
+    export function _cancelNextFrame(runner) {
         if (typeof window !== 'undefined' && window.cancelAnimationFrame) {
             window.cancelAnimationFrame(runner.frameRequestId);
         } else {
@@ -449,5 +443,3 @@ var Common = require('./Common');
      * @type number
      * @default null
      */
-
-})();
