@@ -451,5 +451,3 @@ import * as Common from '../core/Common.js';
 
         return upper.concat(lower);
     };
-
-})();
