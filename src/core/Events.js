@@ -6,13 +6,7 @@
 * @class Events
 */
 
-var Events = {};
-
-module.exports = Events;
-
-var Common = require('./Common');
-
-(function() {
+import * as Common from './Common.js';
 
     /**
      * Subscribes a callback function to the given object's `eventName`.
@@ -21,7 +15,7 @@ var Common = require('./Common');
      * @param {string} eventNames
      * @param {function} callback
      */
-    Events.on = function(object, eventNames, callback) {
+    export function on(object, eventNames, callback) {
         var names = eventNames.split(' '),
             name;
 
@@ -42,7 +36,7 @@ var Common = require('./Common');
      * @param {string} eventNames
      * @param {function} callback
      */
-    Events.off = function(object, eventNames, callback) {
+    export function off(object, eventNames, callback) {
         if (!eventNames) {
             object.events = {};
             return;
@@ -78,7 +72,7 @@ var Common = require('./Common');
      * @param {string} eventNames
      * @param {} event
      */
-    Events.trigger = function(object, eventNames, event) {
+    export function trigger(object, eventNames, event) {
         var names,
             name,
             callbacks,
@@ -108,5 +102,3 @@ var Common = require('./Common');
             }
         }
     };
-
-})();
