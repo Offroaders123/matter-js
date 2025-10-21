@@ -12,24 +12,16 @@
 * @class World
 */
 
-var World = {};
-
-module.exports = World;
-
-var Composite = require('./Composite');
-var Common = require('../core/Common');
-
-(function() {
+import * as Composite from './Composite.js';
+import * as Common from '../core/Common.js';
 
     /**
      * See above, aliases for back compatibility only
      */
-    World.create = Composite.create;
-    World.add = Composite.add;
-    World.remove = Composite.remove;
-    World.clear = Composite.clear;
-    World.addComposite = Composite.addComposite;
-    World.addBody = Composite.addBody;
-    World.addConstraint = Composite.addConstraint;
-
-})();
+    export const create = Composite.create;
+    export const add = Composite.add;
+    export const remove = Composite.remove;
+    export const clear = Composite.clear;
+    export const addComposite = Composite.addComposite;
+    export const addBody = Composite.addBody;
+    export const addConstraint = Composite.addConstraint;
