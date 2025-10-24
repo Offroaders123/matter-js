@@ -14,8 +14,8 @@ var SAT = {};
 
 export default SAT;
 
-var Collision = require('./Collision');
-var Common = require('../core/Common');
+import * as Collision from './Collision.js';
+import * as Common from '../core/Common.js';
 var deprecated = Common.deprecated;
 
     /**
