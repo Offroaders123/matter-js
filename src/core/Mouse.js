@@ -4,13 +4,7 @@
 * @class Mouse
 */
 
-var Mouse = {};
-
-module.exports = Mouse;
-
-var Common = require('../core/Common');
-
-(function() {
+import * as Common from '../core/Common.js';
 
     /**
      * Creates a mouse input.
@@ -18,7 +12,7 @@ var Common = require('../core/Common');
      * @param {HTMLElement} element
      * @return {mouse} A new mouse
      */
-    Mouse.create = function(element) {
+    export function create(element) {
         var mouse = {};
 
         if (!element) {
@@ -44,7 +38,7 @@ var Common = require('../core/Common');
         };
         
         mouse.mousemove = function(event) { 
-            var position = Mouse._getRelativeMousePosition(event, mouse.element, mouse.pixelRatio),
+            var position = _getRelativeMousePosition(event, mouse.element, mouse.pixelRatio),
                 touches = event.changedTouches;
 
             if (touches) {
@@ -60,7 +54,7 @@ var Common = require('../core/Common');
         };
         
         mouse.mousedown = function(event) {
-            var position = Mouse._getRelativeMousePosition(event, mouse.element, mouse.pixelRatio),
+            var position = _getRelativeMousePosition(event, mouse.element, mouse.pixelRatio),
                 touches = event.changedTouches;
 
             if (touches) {
@@ -80,7 +74,7 @@ var Common = require('../core/Common');
         };
         
         mouse.mouseup = function(event) {
-            var position = Mouse._getRelativeMousePosition(event, mouse.element, mouse.pixelRatio),
+            var position = _getRelativeMousePosition(event, mouse.element, mouse.pixelRatio),
                 touches = event.changedTouches;
 
             if (touches) {
@@ -103,7 +97,7 @@ var Common = require('../core/Common');
             mouse.sourceEvents.mousewheel = event;
         };
 
-        Mouse.setElement(mouse, mouse.element);
+        setElement(mouse, mouse.element);
 
         return mouse;
     };
@@ -114,7 +108,7 @@ var Common = require('../core/Common');
      * @param {mouse} mouse
      * @param {HTMLElement} element
      */
-    Mouse.setElement = function(mouse, element) {
+    export function setElement(mouse, element) {
         mouse.element = element;
 
         element.addEventListener('mousemove', mouse.mousemove, { passive: true });
@@ -133,7 +127,7 @@ var Common = require('../core/Common');
      * @method clearSourceEvents
      * @param {mouse} mouse
      */
-    Mouse.clearSourceEvents = function(mouse) {
+    export function clearSourceEvents(mouse) {
         mouse.sourceEvents.mousemove = null;
         mouse.sourceEvents.mousedown = null;
         mouse.sourceEvents.mouseup = null;
@@ -147,7 +141,7 @@ var Common = require('../core/Common');
      * @param {mouse} mouse
      * @param {vector} offset
      */
-    Mouse.setOffset = function(mouse, offset) {
+    export function setOffset(mouse, offset) {
         mouse.offset.x = offset.x;
         mouse.offset.y = offset.y;
         mouse.position.x = mouse.absolute.x * mouse.scale.x + mouse.offset.x;
@@ -160,7 +154,7 @@ var Common = require('../core/Common');
      * @param {mouse} mouse
      * @param {vector} scale
      */
-    Mouse.setScale = function(mouse, scale) {
+    export function setScale(mouse, scale) {
         mouse.scale.x = scale.x;
         mouse.scale.y = scale.y;
         mouse.position.x = mouse.absolute.x * mouse.scale.x + mouse.offset.x;
@@ -176,7 +170,7 @@ var Common = require('../core/Common');
      * @param {number} pixelRatio
      * @return {}
      */
-    Mouse._getRelativeMousePosition = function(event, element, pixelRatio) {
+    export function _getRelativeMousePosition(event, element, pixelRatio) {
         var elementBounds = element.getBoundingClientRect(),
             rootNode = (document.documentElement || document.body.parentNode || document.body),
             scrollX = (window.pageXOffset !== undefined) ? window.pageXOffset : rootNode.scrollLeft,
@@ -197,5 +191,3 @@ var Common = require('../core/Common');
             y: y / (element.clientHeight / (element.height || element.clientHeight) * pixelRatio)
         };
     };
-
-})();
