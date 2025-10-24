@@ -8,23 +8,17 @@
 * @class Engine
 */
 
-var Engine = {};
+import * as Sleeping from './Sleeping.js';
+import * as Resolver from '../collision/Resolver.js';
+import * as Detector from '../collision/Detector.js';
+import * as Pairs from '../collision/Pairs.js';
+import * as Events from './Events.js';
+import * as Composite from '../body/Composite.js';
+import * as Constraint from '../constraint/Constraint.js';
+import * as Common from './Common.js';
+import * as Body from '../body/Body.js';
 
-module.exports = Engine;
-
-var Sleeping = require('./Sleeping');
-var Resolver = require('../collision/Resolver');
-var Detector = require('../collision/Detector');
-var Pairs = require('../collision/Pairs');
-var Events = require('./Events');
-var Composite = require('../body/Composite');
-var Constraint = require('../constraint/Constraint');
-var Common = require('./Common');
-var Body = require('../body/Body');
-
-(function() {
-
-    Engine._deltaMax = 1000 / 60;
+    export let _deltaMax = 1000 / 60;
 
     /**
      * Creates a new engine. The options parameter is an object that specifies any properties you wish to override the defaults.
@@ -34,7 +28,7 @@ var Body = require('../body/Body');
      * @param {object} [options]
      * @return {engine} engine
      */
-    Engine.create = function(options) {
+    export function create(options) {
         options = options || {};
 
         var defaults = {
@@ -82,7 +76,7 @@ var Body = require('../body/Body');
      * @param {engine} engine
      * @param {number} [delta=16.666]
      */
-    Engine.update = function(engine, delta) {
+    export function update(engine, delta) {
         var startTime = Common.now();
 
         var world = engine.world,
@@ -93,9 +87,9 @@ var Body = require('../body/Body');
             i;
 
         // warn if high delta
-        if (delta > Engine._deltaMax) {
+        if (delta > _deltaMax) {
             Common.warnOnce(
-                'Matter.Engine.update: delta argument is recommended to be less than or equal to', Engine._deltaMax.toFixed(3), 'ms.'
+                'Matter.Engine.update: delta argument is recommended to be less than or equal to', _deltaMax.toFixed(3), 'ms.'
             );
         }
 
@@ -132,11 +126,11 @@ var Body = require('../body/Body');
             Sleeping.update(allBodies, delta);
 
         // apply gravity to all bodies
-        Engine._bodiesApplyGravity(allBodies, engine.gravity);
+        _bodiesApplyGravity(allBodies, engine.gravity);
 
         // update all body position and rotation by integration
         if (delta > 0) {
-            Engine._bodiesUpdate(allBodies, delta);
+            _bodiesUpdate(allBodies, delta);
         }
 
         Events.trigger(engine, 'beforeSolve', event);
@@ -190,7 +184,7 @@ var Body = require('../body/Body');
         }
 
         // update body speed and velocity properties
-        Engine._bodiesUpdateVelocities(allBodies);
+        _bodiesUpdateVelocities(allBodies);
 
         // trigger collision events
         if (pairs.collisionActive.length > 0) {
@@ -210,7 +204,7 @@ var Body = require('../body/Body');
         }
 
         // clear force buffers
-        Engine._bodiesClearForces(allBodies);
+        _bodiesClearForces(allBodies);
 
         Events.trigger(engine, 'afterUpdate', event);
 
@@ -226,13 +220,13 @@ var Body = require('../body/Body');
      * @param {engine} engineA
      * @param {engine} engineB
      */
-    Engine.merge = function(engineA, engineB) {
+    export function merge(engineA, engineB) {
         Common.extend(engineA, engineB);
         
         if (engineB.world) {
             engineA.world = engineB.world;
 
-            Engine.clear(engineA);
+            clear(engineA);
 
             var bodies = Composite.allBodies(engineA.world);
 
@@ -249,7 +243,7 @@ var Body = require('../body/Body');
      * @method clear
      * @param {engine} engine
      */
-    Engine.clear = function(engine) {
+    export function clear(engine) {
         Pairs.clear(engine.pairs);
         Detector.clear(engine.detector);
     };
@@ -260,7 +254,7 @@ var Body = require('../body/Body');
      * @private
      * @param {body[]} bodies
      */
-    Engine._bodiesClearForces = function(bodies) {
+    export function _bodiesClearForces(bodies) {
         var bodiesLength = bodies.length;
 
         for (var i = 0; i < bodiesLength; i++) {
@@ -282,7 +276,7 @@ var Body = require('../body/Body');
      * @param {body[]} bodies
      * @param {vector} gravity
      */
-    Engine._bodiesApplyGravity = function(bodies, gravity) {
+    export function _bodiesApplyGravity(bodies, gravity) {
         var gravityScale = typeof gravity.scale !== 'undefined' ? gravity.scale : 0.001,
             bodiesLength = bodies.length;
 
@@ -309,7 +303,7 @@ var Body = require('../body/Body');
      * @param {body[]} bodies
      * @param {number} delta The amount of time elapsed between updates
      */
-    Engine._bodiesUpdate = function(bodies, delta) {
+    export function _bodiesUpdate(bodies, delta) {
         var bodiesLength = bodies.length;
 
         for (var i = 0; i < bodiesLength; i++) {
@@ -328,7 +322,7 @@ var Body = require('../body/Body');
      * @private
      * @param {body[]} bodies
      */
-    Engine._bodiesUpdateVelocities = function(bodies) {
+    export function _bodiesUpdateVelocities(bodies) {
         var bodiesLength = bodies.length;
 
         for (var i = 0; i < bodiesLength; i++) {
@@ -579,5 +573,3 @@ var Body = require('../body/Body');
      * @type object
      * @default 0.001
      */
-
-})();
