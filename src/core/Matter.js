@@ -6,12 +6,10 @@
 
 var Matter = {};
 
-module.exports = Matter;
+export default Matter;
 
-var Plugin = require('./Plugin');
-var Common = require('./Common');
-
-(function() {
+import * as Plugin from './Plugin.js';
+import * as Common from './Common.js';
 
     /**
      * The library name.
@@ -82,5 +80,3 @@ var Common = require('./Common');
         path = path.replace(/^Matter./, '');
         return Common.chainPathAfter(Matter, path, func);
     };
-
-})();
