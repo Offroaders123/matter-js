@@ -7,21 +7,15 @@
 * @class MouseConstraint
 */
 
-var MouseConstraint = {};
-
-module.exports = MouseConstraint;
-
-var Vertices = require('../geometry/Vertices');
-var Sleeping = require('../core/Sleeping');
-var Mouse = require('../core/Mouse');
-var Events = require('../core/Events');
-var Detector = require('../collision/Detector');
-var Constraint = require('./Constraint');
-var Composite = require('../body/Composite');
-var Common = require('../core/Common');
-var Bounds = require('../geometry/Bounds');
-
-(function() {
+import * as Vertices from '../geometry/Vertices.js';
+import * as Sleeping from '../core/Sleeping.js';
+import * as Mouse from '../core/Mouse.js';
+import * as Events from '../core/Events.js';
+import * as Detector from '../collision/Detector.js';
+import * as Constraint from './Constraint.js';
+import * as Composite from '../body/Composite.js';
+import * as Common from '../core/Common.js';
+import * as Bounds from '../geometry/Bounds.js';
 
     /**
      * Creates a new mouse constraint.
@@ -32,7 +26,7 @@ var Bounds = require('../geometry/Bounds');
      * @param {} options
      * @return {MouseConstraint} A new MouseConstraint
      */
-    MouseConstraint.create = function(engine, options) {
+    export function create(engine, options) {
         var mouse = (engine ? engine.mouse : null) || (options ? options.mouse : null);
 
         if (!mouse) {
@@ -76,8 +70,8 @@ var Bounds = require('../geometry/Bounds');
 
         Events.on(engine, 'beforeUpdate', function() {
             var allBodies = Composite.allBodies(engine.world);
-            MouseConstraint.update(mouseConstraint, allBodies);
-            MouseConstraint._triggerEvents(mouseConstraint);
+            update(mouseConstraint, allBodies);
+            _triggerEvents(mouseConstraint);
         });
 
         return mouseConstraint;
@@ -90,7 +84,7 @@ var Bounds = require('../geometry/Bounds');
      * @param {MouseConstraint} mouseConstraint
      * @param {body[]} bodies
      */
-    MouseConstraint.update = function(mouseConstraint, bodies) {
+    export function update(mouseConstraint, bodies) {
         var mouse = mouseConstraint.mouse,
             constraint = mouseConstraint.constraint,
             body = mouseConstraint.body;
@@ -136,7 +130,7 @@ var Bounds = require('../geometry/Bounds');
      * @private
      * @param {mouse} mouseConstraint
      */
-    MouseConstraint._triggerEvents = function(mouseConstraint) {
+    export function _triggerEvents(mouseConstraint) {
         var mouse = mouseConstraint.mouse,
             mouseEvents = mouse.sourceEvents;
 
@@ -257,5 +251,3 @@ var Bounds = require('../geometry/Bounds');
      * @property collisionFilter
      * @type object
      */
-
-})();
