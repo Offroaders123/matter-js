@@ -9,16 +9,14 @@
 
 var Composites = {};
 
-module.exports = Composites;
+export default Composites;
 
-var Composite = require('../body/Composite');
-var Constraint = require('../constraint/Constraint');
-var Common = require('../core/Common');
-var Body = require('../body/Body');
-var Bodies = require('./Bodies');
+import * as Composite from '../body/Composite.js';
+import * as Constraint from '../constraint/Constraint.js';
+import * as Common from '../core/Common.js';
+import * as Body from '../body/Body.js';
+import * as Bodies from './Bodies.js';
 var deprecated = Common.deprecated;
-
-(function() {
 
     /**
      * Create a new composite containing bodies created in the callback in a grid arrangement.
@@ -334,4 +332,3 @@ var deprecated = Common.deprecated;
     };
 
     deprecated(Composites, 'softBody', 'Composites.softBody ➤ moved to softBody and cloth examples');
-})();
