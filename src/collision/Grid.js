@@ -12,7 +12,6 @@
 
 import * as Pair from './Pair.js';
 import * as Common from '../core/Common.js';
-var deprecated = Common.deprecated;
 
     /**
      * Creates a new grid.
@@ -130,8 +129,6 @@ var deprecated = Common.deprecated;
             grid.pairsList = _createActivePairsList(grid);
     };
 
-    deprecated(Grid, 'update', 'Grid.update ➤ replaced by Matter.Detector');
-
     /**
      * Clears the grid.
      * @deprecated replaced by Matter.Detector
@@ -143,8 +140,6 @@ var deprecated = Common.deprecated;
         grid.pairs = {};
         grid.pairsList = [];
     };
-
-    deprecated(Grid, 'clear', 'Grid.clear ➤ replaced by Matter.Detector');
 
     /**
      * Finds the union of two regions.

@@ -16,7 +16,6 @@ import * as Constraint from '../constraint/Constraint.js';
 import * as Common from '../core/Common.js';
 import * as Body from '../body/Body.js';
 import * as Bodies from './Bodies.js';
-var deprecated = Common.deprecated;
 
     /**
      * Create a new composite containing bodies created in the callback in a grid arrangement.
@@ -226,8 +225,6 @@ var deprecated = Common.deprecated;
 
         return newtonsCradle;
     };
-
-    deprecated(Composites, 'newtonsCradle', 'Composites.newtonsCradle ➤ moved to newtonsCradle example');
     
     /**
      * This has now moved to the [car example](https://github.com/liabru/matter-js/blob/master/examples/car.js), follow that instead as this function is deprecated here.
@@ -297,8 +294,6 @@ var deprecated = Common.deprecated;
         return car;
     };
 
-    deprecated(Composites, 'car', 'Composites.car ➤ moved to car example');
-
     /**
      * This has now moved to the [softBody example](https://github.com/liabru/matter-js/blob/master/examples/softBody.js)
      * and the [cloth example](https://github.com/liabru/matter-js/blob/master/examples/cloth.js), follow those instead as this function is deprecated here.
@@ -330,5 +325,3 @@ var deprecated = Common.deprecated;
 
         return softBody;
     };
-
-    deprecated(Composites, 'softBody', 'Composites.softBody ➤ moved to softBody and cloth examples');

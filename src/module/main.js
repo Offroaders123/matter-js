@@ -32,4 +32,4 @@ export * as World from '../body/World.js';
 
 // temporary back compatibility
 module.exports.Engine.run = module.exports.Runner.run;
-module.exports.Common.deprecated(module.exports.Engine, 'run', 'Engine.run ➤ use Matter.Runner.run(engine) instead');
+// module.exports.Common.deprecated(module.exports.Engine, 'run', 'Engine.run ➤ use Matter.Runner.run(engine) instead');

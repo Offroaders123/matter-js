@@ -16,7 +16,6 @@ export default SAT;
 
 import * as Collision from './Collision.js';
 import * as Common from '../core/Common.js';
-var deprecated = Common.deprecated;
 
     /**
      * Detect collision between two bodies using the Separating Axis Theorem.
@@ -29,5 +28,3 @@ var deprecated = Common.deprecated;
     SAT.collides = function(bodyA, bodyB) {
         return Collision.collides(bodyA, bodyB);
     };
-
-    deprecated(SAT, 'collides', 'SAT.collides ➤ replaced by Collision.collides');
