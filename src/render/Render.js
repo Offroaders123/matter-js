@@ -6,19 +6,13 @@
 * @class Render
 */
 
-var Render = {};
-
-module.exports = Render;
-
-var Body = require('../body/Body');
-var Common = require('../core/Common');
-var Composite = require('../body/Composite');
-var Bounds = require('../geometry/Bounds');
-var Events = require('../core/Events');
-var Vector = require('../geometry/Vector');
-var Mouse = require('../core/Mouse');
-
-(function() {
+import * as Body from '../body/Body.js';
+import * as Common from '../core/Common.js';
+import * as Composite from '../body/Composite.js';
+import * as Bounds from '../geometry/Bounds.js';
+import * as Events from '../core/Events.js';
+import * as Vector from '../geometry/Vector.js';
+import * as Mouse from '../core/Mouse.js';
 
     var _requestAnimationFrame,
         _cancelAnimationFrame;
@@ -32,8 +26,8 @@ var Mouse = require('../core/Mouse');
                                       || window.webkitCancelAnimationFrame || window.msCancelAnimationFrame;
     }
 
-    Render._goodFps = 30;
-    Render._goodDelta = 1000 / 60;
+    export let _goodFps = 30;
+    export let _goodDelta = 1000 / 60;
 
     /**
      * Creates a new renderer. The options parameter is an object that specifies any properties you wish to override the defaults.
@@ -43,7 +37,7 @@ var Mouse = require('../core/Mouse');
      * @param {object} [options]
      * @return {render} A new renderer
      */
-    Render.create = function(options) {
+    export function create(options) {
         var defaults = {
             engine: null,
             element: null,
@@ -122,7 +116,7 @@ var Mouse = require('../core/Mouse');
         render.options.showBroadphase = false;
 
         if (render.options.pixelRatio !== 1) {
-            Render.setPixelRatio(render, render.options.pixelRatio);
+            setPixelRatio(render, render.options.pixelRatio);
         }
 
         if (Common.isElement(render.element)) {
@@ -137,22 +131,22 @@ var Mouse = require('../core/Mouse');
      * @method run
      * @param {render} render
      */
-    Render.run = function(render) {
+    export function run(render) {
         (function loop(time){
             render.frameRequestId = _requestAnimationFrame(loop);
             
             _updateTiming(render, time);
 
-            Render.world(render, time);
+            world(render, time);
 
             render.context.setTransform(render.options.pixelRatio, 0, 0, render.options.pixelRatio, 0, 0);
 
             if (render.options.showStats || render.options.showDebug) {
-                Render.stats(render, render.context, time);
+                stats(render, render.context, time);
             }
 
             if (render.options.showPerformance || render.options.showDebug) {
-                Render.performance(render, render.context, time);
+                performance(render, render.context, time);
             }
 
             render.context.setTransform(1, 0, 0, 1, 0, 0);
@@ -164,7 +158,7 @@ var Mouse = require('../core/Mouse');
      * @method stop
      * @param {render} render
      */
-    Render.stop = function(render) {
+    export function stop(render) {
         _cancelAnimationFrame(render.frameRequestId);
     };
 
@@ -175,7 +169,7 @@ var Mouse = require('../core/Mouse');
      * @param {render} render
      * @param {number} pixelRatio
      */
-    Render.setPixelRatio = function(render, pixelRatio) {
+    export function setPixelRatio(render, pixelRatio) {
         var options = render.options,
             canvas = render.canvas;
 
@@ -207,14 +201,14 @@ var Mouse = require('../core/Mouse');
      * @param {number} width The width (in CSS pixels)
      * @param {number} height The height (in CSS pixels)
      */
-    Render.setSize = function(render, width, height) {
+    export function setSize(render, width, height) {
         render.options.width = width;
         render.options.height = height;
         render.bounds.max.x = render.bounds.min.x + width;
         render.bounds.max.y = render.bounds.min.y + height;
 
         if (render.options.pixelRatio !== 1) {
-            Render.setPixelRatio(render, render.options.pixelRatio);
+            setPixelRatio(render, render.options.pixelRatio);
         } else {
             render.canvas.width = width;
             render.canvas.height = height;
@@ -234,7 +228,7 @@ var Mouse = require('../core/Mouse');
      * @param {vector} [padding]
      * @param {bool} [center=true]
      */
-    Render.lookAt = function(render, objects, padding, center) {
+    export function lookAt(render, objects, padding, center) {
         center = typeof center !== 'undefined' ? center : true;
         objects = Common.isArray(objects) ? objects : [objects];
         padding = padding || {
@@ -324,7 +318,7 @@ var Mouse = require('../core/Mouse');
      * @method startViewTransform
      * @param {render} render
      */
-    Render.startViewTransform = function(render) {
+    export function startViewTransform(render) {
         var boundsWidth = render.bounds.max.x - render.bounds.min.x,
             boundsHeight = render.bounds.max.y - render.bounds.min.y,
             boundsScaleX = boundsWidth / render.options.width,
@@ -343,7 +337,7 @@ var Mouse = require('../core/Mouse');
      * @method endViewTransform
      * @param {render} render
      */
-    Render.endViewTransform = function(render) {
+    export function endViewTransform(render) {
         render.context.setTransform(render.options.pixelRatio, 0, 0, render.options.pixelRatio, 0, 0);
     };
 
@@ -353,7 +347,7 @@ var Mouse = require('../core/Mouse');
      * @method world
      * @param {render} render
      */
-    Render.world = function(render, time) {
+    export function world(render, time) {
         var startTime = Common.now(),
             engine = render.engine,
             world = engine.world,
@@ -366,7 +360,7 @@ var Mouse = require('../core/Mouse');
             allConstraints = Composite.allConstraints(world),
             background = options.wireframes ? options.wireframeBackground : options.background,
             bodies = [],
-            constraints = [],
+            constraints_ = [],
             i;
 
         var event = {
@@ -409,11 +403,11 @@ var Mouse = require('../core/Mouse');
                     continue;
 
                 if (Bounds.contains(render.bounds, pointAWorld) || Bounds.contains(render.bounds, pointBWorld))
-                    constraints.push(constraint);
+                    constraints_.push(constraint);
             }
 
             // transform the view
-            Render.startViewTransform(render);
+            startViewTransform(render);
 
             // update mouse
             if (render.mouse) {
@@ -425,7 +419,7 @@ var Mouse = require('../core/Mouse');
                 Mouse.setOffset(render.mouse, render.bounds.min);
             }
         } else {
-            constraints = allConstraints;
+            constraints_ = allConstraints;
             bodies = allBodies;
 
             if (render.options.pixelRatio !== 1) {
@@ -435,47 +429,47 @@ var Mouse = require('../core/Mouse');
 
         if (!options.wireframes || (engine.enableSleeping && options.showSleeping)) {
             // fully featured rendering of bodies
-            Render.bodies(render, bodies, context);
+            bodies(render, bodies, context);
         } else {
             if (options.showConvexHulls)
-                Render.bodyConvexHulls(render, bodies, context);
+                bodyConvexHulls(render, bodies, context);
 
             // optimised method for wireframes only
-            Render.bodyWireframes(render, bodies, context);
+            bodyWireframes(render, bodies, context);
         }
 
         if (options.showBounds)
-            Render.bodyBounds(render, bodies, context);
+            bodyBounds(render, bodies, context);
 
         if (options.showAxes || options.showAngleIndicator)
-            Render.bodyAxes(render, bodies, context);
+            bodyAxes(render, bodies, context);
 
         if (options.showPositions)
-            Render.bodyPositions(render, bodies, context);
+            bodyPositions(render, bodies, context);
 
         if (options.showVelocity)
-            Render.bodyVelocity(render, bodies, context);
+            bodyVelocity(render, bodies, context);
 
         if (options.showIds)
-            Render.bodyIds(render, bodies, context);
+            bodyIds(render, bodies, context);
 
         if (options.showSeparations)
-            Render.separations(render, engine.pairs.list, context);
+            separations(render, engine.pairs.list, context);
 
         if (options.showCollisions)
-            Render.collisions(render, engine.pairs.list, context);
+            collisions(render, engine.pairs.list, context);
 
         if (options.showVertexNumbers)
-            Render.vertexNumbers(render, bodies, context);
+            vertexNumbers(render, bodies, context);
 
         if (options.showMousePosition)
-            Render.mousePosition(render, render.mouse, context);
+            mousePosition(render, render.mouse, context);
 
-        Render.constraints(constraints, context);
+        constraints(constraints_, context);
 
         if (options.hasBounds) {
             // revert view transforms
-            Render.endViewTransform(render);
+            endViewTransform(render);
         }
 
         Events.trigger(render, 'afterRender', event);
@@ -492,7 +486,7 @@ var Mouse = require('../core/Mouse');
      * @param {RenderingContext} context
      * @param {Number} time
      */
-    Render.stats = function(render, context, time) {
+    export function stats(render, context, time) {
         var engine = render.engine,
             world = engine.world,
             bodies = Composite.allBodies(world),
@@ -546,7 +540,7 @@ var Mouse = require('../core/Mouse');
      * @param {render} render
      * @param {RenderingContext} context
      */
-    Render.performance = function(render, context) {
+    export function performance(render, context) {
         var engine = render.engine,
             timing = render.timing,
             deltaHistory = timing.deltaHistory,
@@ -580,23 +574,23 @@ var Mouse = require('../core/Mouse');
         context.fillRect(0, 50, gap * 5 + width * 6 + 22, height);
 
         // show FPS
-        Render.status(
+        status(
             context, x, y, width, graphHeight, deltaHistory.length, 
             Math.round(fps) + ' fps', 
-            fps / Render._goodFps,
+            fps / _goodFps,
             function(i) { return (deltaHistory[i] / deltaMean) - 1; }
         );
 
         // show engine delta
-        Render.status(
+        status(
             context, x + gap + width, y, width, graphHeight, engineDeltaHistory.length,
             lastEngineDelta.toFixed(2) + ' dt', 
-            Render._goodDelta / lastEngineDelta,
+            _goodDelta / lastEngineDelta,
             function(i) { return (engineDeltaHistory[i] / engineDeltaMean) - 1; }
         );
 
         // show engine updates per frame
-        Render.status(
+        status(
             context, x + (gap + width) * 2, y, width, graphHeight, engineUpdatesHistory.length,
             lastEngineUpdatesPerFrame + ' upf', 
             Math.pow(Common.clamp((engineUpdatesMean / neededUpdatesPerFrame) || 1, 0, 1), 4),
@@ -604,23 +598,23 @@ var Mouse = require('../core/Mouse');
         );
 
         // show engine update time
-        Render.status(
+        status(
             context, x + (gap + width) * 3, y, width, graphHeight, engineElapsedHistory.length,
             engineElapsedMean.toFixed(2) + ' ut', 
-            1 - (lastEngineUpdatesPerFrame * engineElapsedMean / Render._goodFps),
+            1 - (lastEngineUpdatesPerFrame * engineElapsedMean / _goodFps),
             function(i) { return (engineElapsedHistory[i] / engineElapsedMean) - 1; }
         );
 
         // show render time
-        Render.status(
+        status(
             context, x + (gap + width) * 4, y, width, graphHeight, elapsedHistory.length,
             elapsedMean.toFixed(2) + ' rt', 
-            1 - (elapsedMean / Render._goodFps),
+            1 - (elapsedMean / _goodFps),
             function(i) { return (elapsedHistory[i] / elapsedMean) - 1; }
         );
 
         // show effective speed
-        Render.status(
+        status(
             context, x + (gap + width) * 5, y, width, graphHeight, timestampElapsedHistory.length, 
             rateMean.toFixed(2) + ' x', 
             rateMean * rateMean * rateMean,
@@ -642,7 +636,7 @@ var Mouse = require('../core/Mouse');
      * @param {string} indicator
      * @param {function} plotY
      */
-    Render.status = function(context, x, y, width, height, count, label, indicator, plotY) {
+    export function status(context, x, y, width, height, count, label, indicator, plotY) {
         // background
         context.strokeStyle = '#888';
         context.fillStyle = '#444';
@@ -676,7 +670,7 @@ var Mouse = require('../core/Mouse');
      * @param {constraint[]} constraints
      * @param {RenderingContext} context
      */
-    Render.constraints = function(constraints, context) {
+    export function constraints(constraints, context) {
         var c = context;
 
         for (var i = 0; i < constraints.length; i++) {
@@ -754,7 +748,7 @@ var Mouse = require('../core/Mouse');
      * @param {body[]} bodies
      * @param {RenderingContext} context
      */
-    Render.bodies = function(render, bodies, context) {
+    export function bodies(render, bodies, context) {
         var c = context,
             engine = render.engine,
             options = render.options,
@@ -857,7 +851,7 @@ var Mouse = require('../core/Mouse');
      * @param {body[]} bodies
      * @param {RenderingContext} context
      */
-    Render.bodyWireframes = function(render, bodies, context) {
+    export function bodyWireframes(render, bodies, context) {
         var c = context,
             showInternalEdges = render.options.showInternalEdges,
             body,
@@ -910,7 +904,7 @@ var Mouse = require('../core/Mouse');
      * @param {body[]} bodies
      * @param {RenderingContext} context
      */
-    Render.bodyConvexHulls = function(render, bodies, context) {
+    export function bodyConvexHulls(render, bodies, context) {
         var c = context,
             body,
             part,
@@ -949,7 +943,7 @@ var Mouse = require('../core/Mouse');
      * @param {body[]} bodies
      * @param {RenderingContext} context
      */
-    Render.vertexNumbers = function(render, bodies, context) {
+    export function vertexNumbers(render, bodies, context) {
         var c = context,
             i,
             j,
@@ -975,7 +969,7 @@ var Mouse = require('../core/Mouse');
      * @param {mouse} mouse
      * @param {RenderingContext} context
      */
-    Render.mousePosition = function(render, mouse, context) {
+    export function mousePosition(render, mouse, context) {
         var c = context;
         c.fillStyle = 'rgba(255,255,255,0.8)';
         c.fillText(mouse.position.x + '  ' + mouse.position.y, mouse.position.x + 5, mouse.position.y - 5);
@@ -989,7 +983,7 @@ var Mouse = require('../core/Mouse');
      * @param {body[]} bodies
      * @param {RenderingContext} context
      */
-    Render.bodyBounds = function(render, bodies, context) {
+    export function bodyBounds(render, bodies, context) {
         var c = context,
             engine = render.engine,
             options = render.options;
@@ -1026,7 +1020,7 @@ var Mouse = require('../core/Mouse');
      * @param {body[]} bodies
      * @param {RenderingContext} context
      */
-    Render.bodyAxes = function(render, bodies, context) {
+    export function bodyAxes(render, bodies, context) {
         var c = context,
             engine = render.engine,
             options = render.options,
@@ -1088,7 +1082,7 @@ var Mouse = require('../core/Mouse');
      * @param {body[]} bodies
      * @param {RenderingContext} context
      */
-    Render.bodyPositions = function(render, bodies, context) {
+    export function bodyPositions(render, bodies, context) {
         var c = context,
             engine = render.engine,
             options = render.options,
@@ -1144,7 +1138,7 @@ var Mouse = require('../core/Mouse');
      * @param {body[]} bodies
      * @param {RenderingContext} context
      */
-    Render.bodyVelocity = function(render, bodies, context) {
+    export function bodyVelocity(render, bodies, context) {
         var c = context;
 
         c.beginPath();
@@ -1174,7 +1168,7 @@ var Mouse = require('../core/Mouse');
      * @param {body[]} bodies
      * @param {RenderingContext} context
      */
-    Render.bodyIds = function(render, bodies, context) {
+    export function bodyIds(render, bodies, context) {
         var c = context,
             i,
             j;
@@ -1201,7 +1195,7 @@ var Mouse = require('../core/Mouse');
      * @param {pair[]} pairs
      * @param {RenderingContext} context
      */
-    Render.collisions = function(render, pairs, context) {
+    export function collisions(render, pairs, context) {
         var c = context,
             options = render.options,
             pair,
@@ -1284,7 +1278,7 @@ var Mouse = require('../core/Mouse');
      * @param {pair[]} pairs
      * @param {RenderingContext} context
      */
-    Render.separations = function(render, pairs, context) {
+    export function separations(render, pairs, context) {
         var c = context,
             options = render.options,
             pair,
@@ -1340,7 +1334,7 @@ var Mouse = require('../core/Mouse');
      * @param {inspector} inspector
      * @param {RenderingContext} context
      */
-    Render.inspector = function(inspector, context) {
+    export function inspector(inspector, context) {
         var engine = inspector.engine,
             selected = inspector.selected,
             render = inspector.render,
@@ -1431,7 +1425,7 @@ var Mouse = require('../core/Mouse');
             historySize = timing.historySize,
             timestamp = engine.timing.timestamp;
 
-        timing.delta = time - timing.lastTime || Render._goodDelta;
+        timing.delta = time - timing.lastTime || _goodDelta;
         timing.lastTime = time;
 
         timing.timestampElapsed = timestamp - timing.lastTimestamp || 0;
@@ -1889,5 +1883,3 @@ var Mouse = require('../core/Mouse');
      * @type boolean
      * @default false
      */
-
-})();
