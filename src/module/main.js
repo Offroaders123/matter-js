@@ -1,4 +1,4 @@
-export * from '../core/Matter.js';
+export { default as Matter } from '../core/Matter.js';
 
 export * as Axes from '../geometry/Axes.js';
 export * as Bodies from '../factory/Bodies.js';
