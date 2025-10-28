@@ -9,17 +9,11 @@
 
 // TODO: true circle bodies
 
-var Bodies = {};
-
-module.exports = Bodies;
-
-var Vertices = require('../geometry/Vertices');
-var Common = require('../core/Common');
-var Body = require('../body/Body');
-var Bounds = require('../geometry/Bounds');
-var Vector = require('../geometry/Vector');
-
-(function() {
+import * as Vertices from '../geometry/Vertices.js';
+import * as Common from '../core/Common.js';
+import * as Body from '../body/Body.js';
+import * as Bounds from '../geometry/Bounds.js';
+import * as Vector from '../geometry/Vector.js';
 
     /**
      * Creates a new rigid body model with a rectangle hull. 
@@ -33,7 +27,7 @@ var Vector = require('../geometry/Vector');
      * @param {object} [options]
      * @return {body} A new rectangle body
      */
-    Bodies.rectangle = function(x, y, width, height, options) {
+    export function rectangle(x, y, width, height, options) {
         options = options || {};
 
         var rectangle = { 
@@ -66,7 +60,7 @@ var Vector = require('../geometry/Vector');
      * @param {object} [options]
      * @return {body} A new trapezoid body
      */
-    Bodies.trapezoid = function(x, y, width, height, slope, options) {
+    export function trapezoid(x, y, width, height, slope, options) {
         options = options || {};
 
         if (slope >= 1) {
@@ -115,7 +109,7 @@ var Vector = require('../geometry/Vector');
      * @param {number} [maxSides]
      * @return {body} A new circle body
      */
-    Bodies.circle = function(x, y, radius, options, maxSides) {
+    export function circle(x, y, radius, options, maxSides) {
         options = options || {};
 
         var circle = {
@@ -131,7 +125,7 @@ var Vector = require('../geometry/Vector');
         if (sides % 2 === 1)
             sides += 1;
 
-        return Bodies.polygon(x, y, sides, radius, Common.extend({}, circle, options));
+        return polygon(x, y, sides, radius, Common.extend({}, circle, options));
     };
 
     /**
@@ -146,11 +140,11 @@ var Vector = require('../geometry/Vector');
      * @param {object} [options]
      * @return {body} A new regular polygon body
      */
-    Bodies.polygon = function(x, y, sides, radius, options) {
+    export function polygon(x, y, sides, radius, options) {
         options = options || {};
 
         if (sides < 3)
-            return Bodies.circle(x, y, radius, options);
+            return circle(x, y, radius, options);
 
         var theta = 2 * Math.PI / sides,
             path = '',
@@ -214,7 +208,7 @@ var Vector = require('../geometry/Vector');
      * @param {number} [removeDuplicatePoints=0.01] Threshold when simplifying nearby vertices.
      * @return {body}
      */
-    Bodies.fromVertices = function(x, y, vertexSets, options, flagInternal, removeCollinear, minimumArea, removeDuplicatePoints) {
+    export function fromVertices(x, y, vertexSets, options, flagInternal, removeCollinear, minimumArea, removeDuplicatePoints) {
         var decomp = Common.getDecomp(),
             canDecomp,
             body,
@@ -359,5 +353,3 @@ var Vector = require('../geometry/Vector');
             return parts[0];
         }
     };
-
-})();
