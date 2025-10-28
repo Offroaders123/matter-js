@@ -29,7 +29,3 @@ export * as Svg from '../geometry/Svg.js';
 export * as Vector from '../geometry/Vector.js';
 export * as Vertices from '../geometry/Vertices.js';
 export * as World from '../body/World.js';
-
-// temporary back compatibility
-module.exports.Engine.run = module.exports.Runner.run;
-// module.exports.Common.deprecated(module.exports.Engine, 'run', 'Engine.run ➤ use Matter.Runner.run(engine) instead');

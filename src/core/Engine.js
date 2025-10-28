@@ -68,6 +68,14 @@ import * as Body from '../body/Body.js';
         return engine;
     };
 
+    // temporary back compatibility
+    // module.exports.Engine.run = module.exports.Runner.run;
+    // module.exports.Common.deprecated(module.exports.Engine, 'run', 'Engine.run ➤ use Matter.Runner.run(engine) instead');
+    /**
+     * @deprecated
+     */
+    export { run } from './Runner.js';
+
     /**
      * Moves the simulation forward in time by `delta` milliseconds.
      * Triggers `beforeUpdate`, `beforeSolve` and `afterUpdate` events.
