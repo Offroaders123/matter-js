@@ -10,10 +10,6 @@
 * @deprecated
 */
 
-var SAT = {};
-
-export default SAT;
-
 import * as Collision from './Collision.js';
 import * as Common from '../core/Common.js';
 
@@ -25,6 +21,6 @@ import * as Common from '../core/Common.js';
      * @param {body} bodyB
      * @return {collision} collision
      */
-    SAT.collides = function(bodyA, bodyB) {
+    export function collides(bodyA, bodyB) {
         return Collision.collides(bodyA, bodyB);
     };

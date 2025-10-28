@@ -7,10 +7,6 @@
 * @class Composites
 */
 
-var Composites = {};
-
-export default Composites;
-
 import * as Composite from '../body/Composite.js';
 import * as Constraint from '../constraint/Constraint.js';
 import * as Common from '../core/Common.js';
@@ -30,7 +26,7 @@ import * as Bodies from './Bodies.js';
      * @param {function} callback
      * @return {composite} A new composite containing objects created in the callback
      */
-    Composites.stack = function(x, y, columns, rows, columnGap, rowGap, callback) {
+    export function stack(x, y, columns, rows, columnGap, rowGap, callback) {
         var stack = Composite.create({ label: 'Stack' }),
             currentX = x,
             currentY = y,
@@ -81,7 +77,7 @@ import * as Bodies from './Bodies.js';
      * @param {object} options
      * @return {composite} A new composite containing objects chained together with constraints
      */
-    Composites.chain = function(composite, xOffsetA, yOffsetA, xOffsetB, yOffsetB, options) {
+    export function chain(composite, xOffsetA, yOffsetA, xOffsetB, yOffsetB, options) {
         var bodies = composite.bodies;
         
         for (var i = 1; i < bodies.length; i++) {
@@ -119,7 +115,7 @@ import * as Bodies from './Bodies.js';
      * @param {object} options
      * @return {composite} The composite containing objects meshed together with constraints
      */
-    Composites.mesh = function(composite, columns, rows, crossBrace, options) {
+    export function mesh(composite, columns, rows, crossBrace, options) {
         var bodies = composite.bodies,
             row,
             col,
@@ -171,8 +167,8 @@ import * as Bodies from './Bodies.js';
      * @param {function} callback
      * @return {composite} A new composite containing objects created in the callback
      */
-    Composites.pyramid = function(x, y, columns, rows, columnGap, rowGap, callback) {
-        return Composites.stack(x, y, columns, rows, columnGap, rowGap, function(stackX, stackY, column, row, lastBody, i) {
+    export function pyramid(x, y, columns, rows, columnGap, rowGap, callback) {
+        return stack(x, y, columns, rows, columnGap, rowGap, function(stackX, stackY, column, row, lastBody, i) {
             var actualRows = Math.min(rows, Math.ceil(columns / 2)),
                 lastBodyWidth = lastBody ? lastBody.bounds.max.x - lastBody.bounds.min.x : 0;
             
@@ -210,7 +206,7 @@ import * as Bodies from './Bodies.js';
      * @param {number} length
      * @return {composite} A new composite newtonsCradle body
      */
-    Composites.newtonsCradle = function(x, y, number, size, length) {
+    export function newtonsCradle(x, y, number, size, length) {
         var newtonsCradle = Composite.create({ label: 'Newtons Cradle' });
 
         for (var i = 0; i < number; i++) {
@@ -237,7 +233,7 @@ import * as Bodies from './Bodies.js';
      * @param {number} wheelSize
      * @return {composite} A new composite car body
      */
-    Composites.car = function(x, y, width, height, wheelSize) {
+    export function car(x, y, width, height, wheelSize) {
         var group = Body.nextGroup(true),
             wheelBase = 20,
             wheelAOffset = -width * 0.5 + wheelBase,
@@ -311,15 +307,15 @@ import * as Bodies from './Bodies.js';
      * @param {} constraintOptions
      * @return {composite} A new composite softBody
      */
-    Composites.softBody = function(x, y, columns, rows, columnGap, rowGap, crossBrace, particleRadius, particleOptions, constraintOptions) {
+    export function softBody(x, y, columns, rows, columnGap, rowGap, crossBrace, particleRadius, particleOptions, constraintOptions) {
         particleOptions = Common.extend({ inertia: Infinity }, particleOptions);
         constraintOptions = Common.extend({ stiffness: 0.2, render: { type: 'line', anchors: false } }, constraintOptions);
 
-        var softBody = Composites.stack(x, y, columns, rows, columnGap, rowGap, function(stackX, stackY) {
+        var softBody = stack(x, y, columns, rows, columnGap, rowGap, function(stackX, stackY) {
             return Bodies.circle(stackX, stackY, particleRadius, particleOptions);
         });
 
-        Composites.mesh(softBody, columns, rows, crossBrace, constraintOptions);
+        mesh(softBody, columns, rows, crossBrace, constraintOptions);
 
         softBody.label = 'Soft Body';
 
