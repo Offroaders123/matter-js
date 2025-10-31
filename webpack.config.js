@@ -8,7 +8,7 @@ import fs from 'fs';
 import { execSync } from 'child_process';
 
 export default (env = {}) => {
-    const minimize = env.MINIMIZE || false;
+    const minimize = env.MINIMIZE === true || env.MINIMIZE === 'true';
     const kind = env.KIND || null;
     const sizeThreshold = minimize ? 100 * 1024 : 512 * 1024;
 
