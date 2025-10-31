@@ -1,13 +1,13 @@
 /* eslint-env es6 */
 "use strict";
 
-const webpack = require('webpack');
-const path = require('path');
-const pkg = require('./package.json');
-const fs = require('fs');
-const execSync = require('child_process').execSync;
+import webpack from 'webpack';
+import path from 'path';
+import pkg from './package.json' with { type: 'json' };
+import fs from 'fs';
+import { execSync } from 'child_process';
 
-module.exports = (env = {}) => {
+export default (env = {}) => {
     const minimize = env.MINIMIZE || false;
     const kind = env.KIND || null;
     const sizeThreshold = minimize ? 100 * 1024 : 512 * 1024;
@@ -15,7 +15,7 @@ module.exports = (env = {}) => {
     const commitHash = execSync('git rev-parse --short HEAD').toString().trim();
     const version = !kind ? pkg.version : `${pkg.version}-${kind}+${commitHash}`;
     const license = fs.readFileSync('LICENSE', 'utf8');
-    const resolve = relativePath => path.resolve(__dirname, relativePath);
+    const resolve = relativePath => path.resolve(import.meta.dirname ?? path.dirname(new URL(import.meta.url).pathname), relativePath);
     
     const banner = 
 `${pkg.name} ${version} by @liabru
@@ -24,7 +24,9 @@ License ${pkg.license}${!minimize ? '\n\n' + license : ''}`;
 
     return {
         entry: { 'matter': './src/module/main.js' },
-        node: false,
+        experiments: {
+            outputModule: false, // keep output as UMD
+        },
         output: {
             library: 'Matter',
             libraryTarget: 'umd',
